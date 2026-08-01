@@ -47,7 +47,7 @@ void main() {
 
   test('候補全件の経路が 1 回の呼び出しで返る（§9.1）', () async {
     final engine = GraphRouteEngine(nodes: nodes, edges: edges);
-    final results = await engine.findRoutesToMany(
+    final result = await engine.findRoutesToMany(
       origin: const GeoPoint(35.0, 139.0),
       candidates: [
         shelter('S1', 1, 35.0, 139.0011),
@@ -55,18 +55,20 @@ void main() {
       ],
       profile: const RoutingProfile(),
     );
-    expect(results.keys, containsAll(['S1', 'S2']));
+    final routes = result.routes;
+    expect(result.timedOut, isFalse);
+    expect(routes.keys, containsAll(['S1', 'S2']));
     // S2 は 0→1→2 (200m) が 0→2 (300m) より安い
-    expect(results['S2']!.costSeconds, closeTo(200 / 1.25, 1e-6));
-    expect(results['S2']!.distanceM, closeTo(200, 1e-6));
-    expect(results['S2']!.polyline.length, greaterThanOrEqualTo(3));
-    expect(results['S2']!.instructions.first.kind, TurnKind.depart);
-    expect(results['S2']!.instructions.last.kind, TurnKind.arrive);
+    expect(routes['S2']!.costSeconds, closeTo(200 / 1.25, 1e-6));
+    expect(routes['S2']!.distanceM, closeTo(200, 1e-6));
+    expect(routes['S2']!.polyline.length, greaterThanOrEqualTo(3));
+    expect(routes['S2']!.instructions.first.kind, TurnKind.depart);
+    expect(routes['S2']!.instructions.last.kind, TurnKind.arrive);
   });
 
   test('nearest_node_id 未スナップの候補は結果に含めない', () async {
     final engine = GraphRouteEngine(nodes: nodes, edges: edges);
-    final results = await engine.findRoutesToMany(
+    final result = await engine.findRoutesToMany(
       origin: const GeoPoint(35.0, 139.0),
       candidates: [
         shelter('S1', null, 35.0, 139.0011),
@@ -74,8 +76,8 @@ void main() {
       ],
       profile: const RoutingProfile(),
     );
-    expect(results.containsKey('S1'), isFalse);
-    expect(results.containsKey('S2'), isTrue);
+    expect(result.routes.containsKey('S1'), isFalse);
+    expect(result.routes.containsKey('S2'), isTrue);
   });
 
   test('決定性: 2 回呼んで同一結果（§20.4 MUST）', () async {
@@ -86,9 +88,39 @@ void main() {
         candidates: [shelter('S2', 2, 35.0, 139.0022)],
         profile: const RoutingProfile(),
       );
-      return [r['S2']!.costSeconds, r['S2']!.distanceM];
+      return [r.routes['S2']!.costSeconds, r.routes['S2']!.distanceM];
     }
 
     expect(await run(), await run());
+  });
+
+  test('タイムアウトすると timedOut=true が伝播する', () async {
+    // 大きなグラフを生成 (1000 ノードを鎖状に接続)
+    final bigNodes = <int, GeoPoint>{};
+    final bigEdges = <GraphEdge>[];
+    for (var i = 0; i < 1000; i++) {
+      bigNodes[i] = GeoPoint(35.0, 139.0 + i * 0.0001);
+      if (i > 0) {
+        bigEdges.add(
+          GraphEdge(
+            id: i,
+            fromNode: i - 1,
+            toNode: i,
+            lengthM: 10,
+            wayType: WayType.residential,
+            widthClass: WidthClass.wide,
+          ),
+        );
+      }
+    }
+    final engine = GraphRouteEngine(nodes: bigNodes, edges: bigEdges);
+    final result = await engine.findRoutesToMany(
+      origin: const GeoPoint(35.0, 139.0),
+      candidates: [shelter('S', 999, 35.0, 139.0999)],
+      profile: const RoutingProfile(),
+      timeout: Duration.zero,
+    );
+    // タイムアウトは即座に発生する
+    expect(result.timedOut, isTrue);
   });
 }

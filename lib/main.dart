@@ -3,8 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/providers.dart';
-import 'domain/entities/enums.dart';
-import 'ui/home/home_screen.dart';
+import 'app/routes.dart';
+import 'app/theme.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,14 +25,12 @@ class OfflineCenterApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'オフライン災害対応センター',
-      theme: ThemeData(useMaterial3: true),
-      home: HomeScreen(onSelect: _onDisasterSelected),
+      theme: AppTheme.light(),
+      darkTheme: AppTheme.dark(),
+      // §15.4: 端末の設定に追従 (日出没ベースの自動切替は S-05 / #12 で拡張)。
+      themeMode: ThemeMode.system,
+      initialRoute: AppRoutes.home,
+      onGenerateRoute: onGenerateAppRoute,
     );
-  }
-
-  /// 災害種別確定時の遷移。結果サマリ画面は PR-7 で接続する。
-  static void _onDisasterSelected(DisasterType type) {
-    // 直近選択への保存は HomeScreen 側で実施済み。
-    // TODO(PR-7): 結果サマリ画面へ遷移する。
   }
 }
