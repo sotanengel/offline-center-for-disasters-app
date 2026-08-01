@@ -54,4 +54,19 @@ class ModelRegistry {
     if (ramMb >= 1536) return LlmModelChoice.lfm25_230m;
     return LlmModelChoice.off;
   }
+
+  /// liquid_ai ModelCatalog slug へのマッピング。
+  static String? catalogSlug(LlmModelChoice choice) => switch (choice) {
+    LlmModelChoice.lfm25_1200jp => 'LFM2.5-1.2B-Instruct',
+    LlmModelChoice.lfm25_350m => 'LFM2-350M',
+    LlmModelChoice.lfm25_230m => 'LFM2-350M',
+    LlmModelChoice.auto || LlmModelChoice.off => null,
+  };
+
+  static LlmModelChoice choiceForEntryId(String id) => switch (id) {
+    'lfm25-1200-jp' => LlmModelChoice.lfm25_1200jp,
+    'lfm25-350m' => LlmModelChoice.lfm25_350m,
+    'lfm25-230m' => LlmModelChoice.lfm25_230m,
+    _ => LlmModelChoice.off,
+  };
 }

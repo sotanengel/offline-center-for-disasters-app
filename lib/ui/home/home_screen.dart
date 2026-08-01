@@ -2,22 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
+import '../../core/result/result.dart';
 import '../../domain/entities/disaster_candidate.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/entities/hazard_context.dart';
+import '../../domain/entities/situation_slots.dart';
+import '../../domain/services/situation_analyzer.dart';
 import 'disaster_tile.dart';
 
 /// S-01 ホーム画面（§3.2: 災害種別タイル 8 種 + 一言入力）。
-///
-/// - §3.4-a: ハザードプライアでタイル並び替え・≥70 強調（低スコアも隠さない）
-/// - §3.4-b: 揺れ検知バナー + 地震強調。津波想定域内なら津波を最上位に
-/// - §3.5: 単一種別 ≥100 かつ他 ≤30 のとき種別明示ワンタップボタン
-/// - 緊急導線「わからない・とにかく逃げたい」は §3.6 縮退動作へ接続
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key, this.onSelect});
 
-  /// 災害種別の確定時コールバック（結果画面遷移は PR-7 で接続）。
-  final void Function(DisasterType type)? onSelect;
+  /// 状況確定時コールバック（P5: [SituationSlots] を渡す）。
+  final void Function(SituationSlots slots)? onSelect;
 
   static const _tileMeta = <DisasterType, (String, String)>{
     DisasterType.tsunami: ('🌊', '津波'),
@@ -44,9 +42,10 @@ class HomeScreen extends ConsumerWidget {
     final emphasized = _emphasizedTypes(candidates, ctx, shakeDetected);
     final oneTap = _oneTapType(candidates);
 
-    void select(DisasterType type) {
+    Future<void> select(DisasterType type) async {
       ref.read(recentSelectionStoreProvider).save(type);
-      onSelect?.call(type);
+      final slots = await _buildSlots(ref, type);
+      onSelect?.call(slots);
     }
 
     return Scaffold(
@@ -80,15 +79,34 @@ class HomeScreen extends ConsumerWidget {
               ],
             ),
             const SizedBox(height: 12),
-            _freeTextInput(ref, sttAvailable),
+            _freeTextInput(context, ref, sttAvailable, onSelect),
           ],
         ),
       ),
     );
   }
 
-  /// §3.4-a スコア降順。揺れ検知かつ津波想定域内なら津波を最上位に（§3.4-b MUST）。
-  /// 「わからない」は常に末尾（§3.2 の配置）。
+  static Future<SituationSlots> _buildSlots(
+    WidgetRef ref,
+    DisasterType tileType,
+  ) async {
+    final freeText = ref.read(freeTextProvider).trim();
+    var slots = SituationSlots(disasterType: tileType, source: SlotSource.tile);
+    if (freeText.isEmpty) return slots;
+
+    final analyzer = ref.read(situationAnalyzerProvider);
+    final result = await analyzer.analyze(freeText);
+    if (result case Ok(value: final analyzed)) {
+      slots = analyzed.copyWith(
+        disasterType: tileType,
+        source: tileType == DisasterType.unknown
+            ? analyzed.source
+            : SlotSource.tile,
+      );
+    }
+    return slots;
+  }
+
   List<DisasterType> _orderedTiles(
     List<DisasterCandidate> candidates,
     HazardContext ctx,
@@ -115,44 +133,28 @@ class HomeScreen extends ConsumerWidget {
         if (c.score >= 70) c.type,
     };
     if (shakeDetected) {
-      emphasized.add(DisasterType.earthquake); // §3.4-b: 地震タイルの自動強調
+      emphasized.add(DisasterType.earthquake);
       if (ctx.inTsunamiZone) emphasized.add(DisasterType.tsunami);
     }
     return emphasized;
   }
 
-  /// §3.5: 単一種別 ≥100 かつ他 ≤30 のときだけ種別明示ワンタップを返す。
   DisasterType? _oneTapType(List<DisasterCandidate> candidates) {
     if (candidates.isEmpty) return null;
     final top = candidates.first;
     if (top.score < 100) return null;
-    final othersHigh = candidates.skip(1).any((c) => c.score > 30);
-    return othersHigh ? null : top.type;
+    final othersLow = candidates.skip(1).every((c) => c.score <= 30);
+    return othersLow ? top.type : null;
   }
 
   Widget _shakeBanner(HazardContext ctx) {
     return Card(
-      key: const Key('shake_banner'),
-      color: Colors.red.shade50,
+      color: Colors.orange.shade100,
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              '揺れを検知しました',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            if (ctx.inTsunamiZone)
-              const Text(
-                '津波の危険があります',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.red,
-                ),
-              ),
-          ],
+        child: Text(
+          ctx.inTsunamiZone ? '津波の危険があります' : '揺れを検知しました',
+          style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
       ),
     );
@@ -165,16 +167,13 @@ class HomeScreen extends ConsumerWidget {
   ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: FilledButton.icon(
-        key: const Key('one_tap_evacuate'),
-        style: FilledButton.styleFrom(
-          minimumSize: const Size.fromHeight(72),
-          backgroundColor: Theme.of(context).colorScheme.error,
-          textStyle: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      child: SizedBox(
+        height: 56,
+        width: double.infinity,
+        child: FilledButton(
+          onPressed: onTap,
+          child: Text('${labelOf(type)}から避難する'),
         ),
-        onPressed: onTap,
-        icon: Text(_tileMeta[type]!.$1, style: const TextStyle(fontSize: 28)),
-        label: Text('${labelOf(type)}から避難する'),
       ),
     );
   }
@@ -182,18 +181,14 @@ class HomeScreen extends ConsumerWidget {
   Widget _emergencyButton(BuildContext context, VoidCallback onTap) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: OutlinedButton(
-        key: const Key('emergency_unknown'),
-        style: OutlinedButton.styleFrom(
-          minimumSize: const Size.fromHeight(56),
-          side: BorderSide(
-            color: Theme.of(context).colorScheme.error,
-            width: 2,
-          ),
-          textStyle: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+      child: SizedBox(
+        height: 56,
+        width: double.infinity,
+        child: OutlinedButton(
+          key: const Key('emergency_unknown'),
+          onPressed: onTap,
+          child: const Text('わからない・とにかく逃げたい'),
         ),
-        onPressed: onTap,
-        child: const Text('わからない・とにかく逃げたい'),
       ),
     );
   }
@@ -210,7 +205,12 @@ class HomeScreen extends ConsumerWidget {
     );
   }
 
-  Widget _freeTextInput(WidgetRef ref, bool sttAvailable) {
+  Widget _freeTextInput(
+    BuildContext context,
+    WidgetRef ref,
+    bool sttAvailable,
+    void Function(SituationSlots slots)? onSelect,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -228,19 +228,50 @@ class HomeScreen extends ConsumerWidget {
             IconButton.filled(
               key: const Key('mic_button'),
               iconSize: 32,
-              // §3.2 L2: オフライン認識非対応なら非活性化（MUST）
               onPressed: sttAvailable ? () {} : null,
               icon: const Icon(Icons.mic),
             ),
-            if (!sttAvailable)
-              const Expanded(
-                child: Text(
-                  'オフライン音声認識に未対応のため、音声入力は使えません',
-                  style: TextStyle(fontSize: 13),
-                ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: FilledButton.tonal(
+                key: const Key('analyze_free_text_button'),
+                onPressed: () async {
+                  final freeText = ref.read(freeTextProvider).trim();
+                  if (freeText.isEmpty) return;
+                  final analyzer = ref.read(situationAnalyzerProvider);
+                  final result = await analyzer.analyze(freeText);
+                  if (result is! Ok<SituationSlots, SituationAnalyzerError>) {
+                    return;
+                  }
+                  final slots = result.value;
+                  if (slots.disasterType == DisasterType.unknown) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('災害種別が特定できません。タイルを選んでください。'),
+                        ),
+                      );
+                    }
+                    return;
+                  }
+                  ref
+                      .read(recentSelectionStoreProvider)
+                      .save(slots.disasterType);
+                  onSelect?.call(slots);
+                },
+                child: const Text('自由文から解析'),
               ),
+            ),
           ],
         ),
+        if (!sttAvailable)
+          const Padding(
+            padding: EdgeInsets.only(top: 4),
+            child: Text(
+              'オフライン音声認識に未対応のため、音声入力は使えません',
+              style: TextStyle(fontSize: 13),
+            ),
+          ),
       ],
     );
   }

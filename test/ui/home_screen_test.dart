@@ -5,6 +5,7 @@ import 'package:offline_center_for_disasters/app/providers.dart';
 import 'package:offline_center_for_disasters/domain/entities/disaster_candidate.dart';
 import 'package:offline_center_for_disasters/domain/entities/enums.dart';
 import 'package:offline_center_for_disasters/domain/entities/hazard_context.dart';
+import 'package:offline_center_for_disasters/domain/entities/situation_slots.dart';
 import 'package:offline_center_for_disasters/ui/home/disaster_tile.dart';
 import 'package:offline_center_for_disasters/ui/home/home_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -39,7 +40,7 @@ void main() {
     bool shake = false,
     DisasterType? recent,
     bool sttAvailable = false,
-    void Function(DisasterType)? onSelect,
+    void Function(SituationSlots)? onSelect,
   }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
@@ -203,7 +204,7 @@ void main() {
 
   group('選択の確定（L1: 1 タップで即座に）', () {
     testWidgets('タイル 1 タップでコールバック発火 + 直近選択に保存', (tester) async {
-      final selected = <DisasterType>[];
+      final selected = <SituationSlots>[];
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
       await tester.pumpWidget(
@@ -227,16 +228,16 @@ void main() {
 
       await tester.tap(find.byKey(const Key('tile_tsunami')));
       await tester.pump();
-      expect(selected, [DisasterType.tsunami]);
+      expect(selected.map((s) => s.disasterType), [DisasterType.tsunami]);
       expect(prefs.getString('recent_disaster_type'), 'tsunami');
     });
 
     testWidgets('緊急導線タップは unknown として確定する', (tester) async {
-      final selected = <DisasterType>[];
+      final selected = <SituationSlots>[];
       await pumpHome(tester, onSelect: selected.add);
       await tester.tap(find.byKey(const Key('emergency_unknown')));
       await tester.pump();
-      expect(selected, [DisasterType.unknown]);
+      expect(selected.map((s) => s.disasterType), [DisasterType.unknown]);
     });
 
     testWidgets('直近選択は「継続中」として表示される（§3.4-c）', (tester) async {

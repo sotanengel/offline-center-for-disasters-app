@@ -1,5 +1,4 @@
-# Uncomment this line to define a global platform for your project
-# platform :ios, '13.0'
+platform :ios, '17.0'
 
 # CocoaPods analytics sends network stats synchronously affecting flutter build latency.
 ENV['COCOAPODS_DISABLE_STATS'] = 'true'
@@ -29,6 +28,13 @@ flutter_ios_podfile_setup
 
 target 'Runner' do
   use_frameworks!
+
+  # liquid_ai / LEAP SDK（§6.3 / P5）— CocoaPods 用ローカル podspec
+  pod 'Inference-Engine', :podspec => 'Inference-Engine.podspec'
+  pod 'Inference-Engine-Executorch-Backend', :podspec => 'Inference-Engine-Executorch-Backend.podspec'
+  pod 'Inference-Engine-LlamaCpp-Backend', :podspec => 'Inference-Engine-LlamaCpp-Backend.podspec'
+  pod 'Leap-Model-Downloader', :podspec => 'Leap-Model-Downloader.podspec'
+  pod 'Leap-SDK', :podspec => 'Leap-SDK.podspec'
 
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
   target 'RunnerTests' do
