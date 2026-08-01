@@ -109,6 +109,18 @@ device_restore_app() {
   return 0
 }
 
+# Mac 側で Xcode の自動操作（Automation）許可が下りていないことを示すか。
+#
+# 2026-08-02 実機検証で、この症状（osascript -15）を停滞検知が「開発者未信頼」と
+# 誤って案内した。文言は似て見えるが対処箇所が iPhone 側ではなく Mac 側であり、
+# 混同すると信頼のタップを繰り返すだけで解決しない。
+device_log_indicates_automation_permission_denied() {
+  local log_file="$1"
+  [[ -f "${log_file}" ]] || return 1
+  grep -qE "Error executing osascript|not allowed to send Apple events" \
+    "${log_file}"
+}
+
 device_print_trust_guide() {
   cat <<'EOF'
 【iPhone で開発者を信頼する（初回のみ・再インストール後も必要）】

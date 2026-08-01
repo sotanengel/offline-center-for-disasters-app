@@ -67,6 +67,17 @@ else
   fail=$((fail + 1))
 fi
 
+# osascript -15 (Xcode オートメーション権限) は未信頼と別原因として判別できること。
+# 2026-08-02 実機検証で、この文言を「未信頼」と誤って案内したため回帰させない。
+printf 'Error executing osascript: -15\nCould not run build/ios/iphoneos/Runner.app\n' >"${tmp_log}"
+if device_log_indicates_automation_permission_denied "${tmp_log}"; then
+  echo "PASS: distinguishes Xcode automation permission error"
+  pass=$((pass + 1))
+else
+  echo "FAIL: distinguishes Xcode automation permission error"
+  fail=$((fail + 1))
+fi
+
 # 正常進行しているログを誤検知しない
 printf 'Installing and launching...\n00:04 +1: S-01 ホームが表示される\n' >"${tmp_log}"
 if device_log_indicates_launch_stall "${tmp_log}"; then
