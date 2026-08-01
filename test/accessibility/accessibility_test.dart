@@ -6,6 +6,7 @@ import 'package:offline_center_for_disasters/app/theme.dart';
 import 'package:offline_center_for_disasters/core/geo/geo_point.dart';
 import 'package:offline_center_for_disasters/domain/entities/disaster_candidate.dart';
 import 'package:offline_center_for_disasters/domain/entities/enums.dart';
+import 'package:offline_center_for_disasters/domain/entities/situation_slots.dart';
 import 'package:offline_center_for_disasters/domain/entities/hazard_context.dart';
 import 'package:offline_center_for_disasters/domain/entities/route_result.dart';
 import 'package:offline_center_for_disasters/ui/home/disaster_tile.dart';
@@ -13,6 +14,8 @@ import 'package:offline_center_for_disasters/ui/home/home_screen.dart';
 import 'package:offline_center_for_disasters/ui/nav/nav_screen.dart';
 import 'package:offline_center_for_disasters/ui/result/result_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../helpers/destination_plan_overrides.dart';
 
 /// §15.4 アクセシビリティ: タップ領域・Semantics・主要ボタン高さ。
 void main() {
@@ -67,10 +70,15 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            destinationPlanProviderOverride(),
+          ],
           child: MaterialApp(
             theme: AppTheme.light(),
-            home: const ResultScreen(disasterType: DisasterType.flood),
+            home: const ResultScreen(
+              slots: SituationSlots(disasterType: DisasterType.flood),
+            ),
           ),
         ),
       );
@@ -107,10 +115,15 @@ void main() {
       final prefs = await SharedPreferences.getInstance();
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            destinationPlanProviderOverride(),
+          ],
           child: MaterialApp(
             theme: AppTheme.dark(),
-            home: const ResultScreen(disasterType: DisasterType.flood),
+            home: const ResultScreen(
+              slots: SituationSlots(disasterType: DisasterType.flood),
+            ),
           ),
         ),
       );
@@ -119,18 +132,21 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
+          overrides: [
+            sharedPreferencesProvider.overrideWithValue(prefs),
+            destinationPlanProviderOverride(),
+          ],
           child: MaterialApp(
             theme: AppTheme.dark(),
             home: NavScreen(
-              origin: const GeoPoint(35.68, 139.76),
+              origin: kDefaultOrigin,
               route: RouteResult(
                 targetId: 'x',
                 costSeconds: 60,
                 distanceM: 100,
                 polyline: const [
-                  GeoPoint(35.68, 139.76),
-                  GeoPoint(35.69, 139.77),
+                  kDefaultOrigin,
+                  GeoPoint(35.688741, 139.851977),
                 ],
                 instructions: const [],
               ),

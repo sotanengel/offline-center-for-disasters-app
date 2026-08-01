@@ -49,6 +49,9 @@ dependencies:
   path: ^1.9.1
   shared_preferences: ^2.5.5
   collection: ^1.19.1
+  liquid_ai: ^1.2.2
+  device_info_plus: ^13.2.0
+  connectivity_plus: ^6.1.4
 
 dev_dependencies:
   flutter_test:
@@ -72,6 +75,8 @@ dev_dependencies:
 
 # The following section is specific to Flutter packages.
 flutter:
+  config:
+    enable-swift-package-manager: false
 
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in

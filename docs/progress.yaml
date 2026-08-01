@@ -66,8 +66,13 @@ prs:
     pr: 19
   - id: PR-11
     title: 統合テスト・オフライン CI・アクセシビリティ・最終 progress.yaml
+    status: done
+    pr: 21
+  - id: PR-14
+    title: LEAP SDK 統合・シミュレータ安定化・実避難先表示・座標統一
     status: in_progress
     pr: null
+    features_covered: [F-02, F-03, F-04]
 
 # 要件定義書 §19 の実装フェーズ
 phases:
@@ -100,11 +105,15 @@ phases:
   - id: P5
     title: LEAP SDK 統合・ティア判定・モデルDL・AI-1/AI-2
     spec_ref: "§19"
-    status: out_of_scope
+    status: done
+    pr: null
+    notes: "liquid_ai 採用。LeapLlmEngine + CompositeSituationAnalyzer"
   - id: P6
     title: AI-3 リランキング・AI-4 生成 + ハルシネーションガード
     spec_ref: "§19"
-    status: out_of_scope
+    status: done
+    pr: null
+    notes: "GuideReranker + PhraseGenerator + HallucinationGuard"
   - id: P7
     title: アクセシビリティ・省電力・実機性能チューニング
     spec_ref: "§19"
@@ -223,19 +232,19 @@ llm_models:
     tier: A
     approx_size_mb: 850
     status: done
-    notes: "ModelRegistry + 設定 UI（スタブ推論のみ）"
+    notes: "ModelRegistry + LeapLlmEngine + 設定 DL UI（liquid_ai / LEAP SDK）"
   - id: lfm25-350m
     name: LFM2.5-350M
     tier: B
     approx_size_mb: 250
     status: done
-    notes: "ModelRegistry + 設定 UI（スタブ推論のみ）"
+    notes: "ModelRegistry + LeapLlmEngine + 設定 DL UI（liquid_ai / LEAP SDK）"
   - id: lfm25-230m
     name: LFM2.5-230M
     tier: C
     approx_size_mb: 150
     status: done
-    notes: "ModelRegistry + 設定 UI（スタブ推論のみ）"
+    notes: "ModelRegistry + LeapLlmEngine + 設定 DL UI（liquid_ai / LEAP SDK）"
 
 # 要件定義書 §22 の未決事項の扱い
 open_questions:

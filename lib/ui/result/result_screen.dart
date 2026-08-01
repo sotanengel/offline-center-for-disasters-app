@@ -6,88 +6,47 @@ import '../../app/routes.dart';
 import '../../core/geo/geo_point.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/entities/route_result.dart';
+import '../../domain/entities/situation_slots.dart';
+import '../../domain/usecases/destination_planner.dart';
 import '../../ui/home/home_screen.dart';
 
 /// S-02 結果サマリ（§3.7 / §15.2）。
 class ResultScreen extends ConsumerWidget {
-  const ResultScreen({super.key, required this.disasterType});
+  const ResultScreen({super.key, required this.slots});
 
-  final DisasterType disasterType;
+  final SituationSlots slots;
+
+  DisasterType get disasterType => slots.disasterType;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isUnknown = disasterType == DisasterType.unknown;
-    final location =
-        ref.watch(locationProvider).valueOrNull ??
-        const GeoPoint(35.6812, 139.7671);
+    final simpleMode = ref.watch(llmSimpleModeProvider).valueOrNull ?? false;
+    final planAsync = ref.watch(destinationPlanProvider(slots));
 
     return Scaffold(
       appBar: AppBar(
         title: Text(HomeScreen.labelOf(disasterType)),
         actions: [
+          if (simpleMode)
+            const Padding(
+              padding: EdgeInsets.only(right: 8),
+              child: Chip(label: Text('簡易モード')),
+            ),
           TextButton(
-            onPressed: () => _showTypeSheet(context, ref),
+            onPressed: () => _showTypeSheet(context),
             child: const Text('[変更]'),
           ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(16),
-        children: [
-          _SummaryBar(type: disasterType),
-          const SizedBox(height: 16),
-          if (!isUnknown) ...[
-            _SecondaryInfo(type: disasterType),
-            const SizedBox(height: 16),
-            const Text(
-              '避難先候補',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            _DestinationSummary(type: disasterType),
-          ] else
-            const Text(
-              '災害種別が未確定のため、避難先は断定表示しません（§3.6）',
-              style: TextStyle(fontSize: 18),
-            ),
-          const SizedBox(height: 24),
-          if (!isUnknown)
-            SizedBox(
-              height: 72,
-              child: FilledButton(
-                key: const Key('start_nav_button'),
-                onPressed: () {
-                  Navigator.of(context).pushNamed(
-                    AppRoutes.nav,
-                    arguments: NavArgs(
-                      origin: location,
-                      route: RouteResult(
-                        targetId: 'demo',
-                        costSeconds: 600,
-                        distanceM: 1200,
-                        polyline: [
-                          location,
-                          GeoPoint(location.lat + 0.01, location.lng + 0.01),
-                        ],
-                        instructions: const [
-                          TurnInstruction(
-                            kind: TurnKind.goStraight,
-                            distanceM: 300,
-                            text: '300m 直進',
-                          ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-                child: const Text('案内を開始する', style: TextStyle(fontSize: 20)),
-              ),
-            ),
-        ],
+      body: planAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (e, _) => Center(child: Text('避難先の取得に失敗しました: $e')),
+        data: (plan) => _ResultBody(slots: slots, plan: plan),
       ),
     );
   }
 
-  void _showTypeSheet(BuildContext context, WidgetRef ref) {
+  void _showTypeSheet(BuildContext context) {
     showModalBottomSheet<void>(
       context: context,
       builder: (ctx) => SafeArea(
@@ -99,9 +58,13 @@ class ResultScreen extends ConsumerWidget {
                   title: Text(HomeScreen.labelOf(t)),
                   onTap: () {
                     Navigator.pop(ctx);
-                    Navigator.of(
-                      context,
-                    ).pushReplacementNamed(AppRoutes.result, arguments: t);
+                    Navigator.of(context).pushReplacementNamed(
+                      AppRoutes.result,
+                      arguments: slots.copyWith(
+                        disasterType: t,
+                        source: SlotSource.manual,
+                      ),
+                    );
                   },
                 ),
           ],
@@ -111,59 +74,170 @@ class ResultScreen extends ConsumerWidget {
   }
 }
 
-class _SummaryBar extends StatelessWidget {
-  const _SummaryBar({required this.type});
-  final DisasterType type;
+class _ResultBody extends StatelessWidget {
+  const _ResultBody({required this.slots, required this.plan});
+
+  final SituationSlots slots;
+  final DestinationPlan plan;
+
+  bool get isUnknown => slots.disasterType == DisasterType.unknown;
 
   @override
   Widget build(BuildContext context) {
+    return ListView(
+      padding: const EdgeInsets.all(16),
+      children: [
+        _SummaryBar(slots: slots),
+        if (slots.needsDisasterTypeConfirmation)
+          Padding(
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              '災害種別を選ぶとより正確に案内できます',
+              style: TextStyle(
+                color: Theme.of(context).colorScheme.error,
+                fontSize: 16,
+              ),
+            ),
+          ),
+        const SizedBox(height: 16),
+        if (!isUnknown) ...[
+          _SecondaryInfo(type: slots.disasterType, plan: plan),
+          const SizedBox(height: 16),
+          const Text(
+            '避難先候補',
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          _DestinationSummary(plan: plan),
+        ] else
+          const Text(
+            '災害種別が未確定のため、避難先は断定表示しません（§3.6）',
+            style: TextStyle(fontSize: 18),
+          ),
+        const SizedBox(height: 24),
+        if (!isUnknown && plan.hasShelter)
+          SizedBox(
+            height: 72,
+            child: FilledButton(
+              key: const Key('start_nav_button'),
+              onPressed: () {
+                Navigator.of(context).pushNamed(
+                  AppRoutes.nav,
+                  arguments: NavArgs(
+                    origin: plan.origin,
+                    route: plan.route,
+                    fallbackBearing: plan.route == null,
+                  ),
+                );
+              },
+              child: const Text('案内を開始する', style: TextStyle(fontSize: 20)),
+            ),
+          ),
+      ],
+    );
+  }
+}
+
+class _SummaryBar extends StatelessWidget {
+  const _SummaryBar({required this.slots});
+  final SituationSlots slots;
+
+  @override
+  Widget build(BuildContext context) {
+    final typeLabel = HomeScreen.labelOf(slots.disasterType);
+    final mobility = slots.userState.mobility.name;
+    final urgency = slots.urgency.name;
+    final aiInterpreted =
+        slots.source == SlotSource.ai &&
+        slots.disasterType != DisasterType.unknown &&
+        slots.disasterTypeEvidence.isNotEmpty;
+
+    final bg = slots.needsDisasterTypeConfirmation
+        ? Theme.of(context).colorScheme.errorContainer
+        : aiInterpreted
+        ? Theme.of(context).colorScheme.tertiaryContainer
+        : Theme.of(context).colorScheme.surfaceContainerHighest;
+
+    final summary = aiInterpreted
+        ? '〈$typeLabel〉と解釈しました。違う場合はタップ / 緊急度: $urgency / 移動: $mobility'
+        : '種別: $typeLabel / 緊急度: $urgency / 移動: $mobility';
+
     return Material(
-      color: Theme.of(context).colorScheme.surfaceContainerHighest,
+      color: bg,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
         padding: const EdgeInsets.all(12),
-        child: Text(
-          '種別: ${HomeScreen.labelOf(type)} / 緊急度: 要確認 / 移動: 通常',
-          style: const TextStyle(fontSize: 16),
-        ),
+        child: Text(summary, style: const TextStyle(fontSize: 16)),
       ),
     );
   }
 }
 
 class _SecondaryInfo extends StatelessWidget {
-  const _SecondaryInfo({required this.type});
+  const _SecondaryInfo({required this.type, required this.plan});
   final DisasterType type;
+  final DestinationPlan plan;
 
   @override
   Widget build(BuildContext context) {
     if (type == DisasterType.tsunami) {
-      return const Text(
-        '標高: 12 m（最優先表示 §15.2）',
-        style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-      );
+      final elev = plan.shelter?.elevationM;
+      if (elev != null) {
+        return Text(
+          '標高: ${elev.toStringAsFixed(0)} m（避難先 §15.2）',
+          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+        );
+      }
     }
     if (type == DisasterType.flood || type == DisasterType.stormSurge) {
-      return const Text('浸水想定: 区域外', style: TextStyle(fontSize: 22));
+      final inZone =
+          plan.shelterContext.inFloodZone ||
+          plan.shelterContext.inStormSurgeZone;
+      return Text(
+        inZone ? '浸水想定: 区域内' : '浸水想定: 区域外',
+        style: const TextStyle(fontSize: 22),
+      );
     }
     return const SizedBox.shrink();
   }
 }
 
 class _DestinationSummary extends StatelessWidget {
-  const _DestinationSummary({required this.type});
-  final DisasterType type;
+  const _DestinationSummary({required this.plan});
+  final DestinationPlan plan;
 
   @override
   Widget build(BuildContext context) {
+    if (plan.packMissing) {
+      return const Card(
+        key: Key('destination_summary'),
+        child: ListTile(
+          title: Text('データパック未配置'),
+          subtitle: Text('tool/sim/install_pack.sh で東京パックをインストールしてください'),
+        ),
+      );
+    }
+    if (plan.notFound) {
+      return Card(
+        key: const Key('destination_summary'),
+        child: ListTile(
+          title: const Text('近くに適合する避難所が見つかりません'),
+          subtitle: Text(
+            plan.expandedRadius ? '10km 圏内を探索しました（§4.4）' : '3km 圏内を探索しました',
+          ),
+        ),
+      );
+    }
+    final shelter = plan.shelter!;
+    final distance = plan.distanceM != null
+        ? formatDistanceM(plan.distanceM!)
+        : '—';
+    final subtitle = switch (plan.shelter!.elevationM) {
+      final e? when e > 0 => '標高 ${e.toStringAsFixed(0)}m / 距離 $distance',
+      _ => '距離 $distance',
+    };
     return Card(
       key: const Key('destination_summary'),
-      child: ListTile(
-        title: const Text('○○小学校'),
-        subtitle: Text(
-          type == DisasterType.tsunami ? '標高 15m / 距離 1.2km' : '距離 1.2km',
-        ),
-      ),
+      child: ListTile(title: Text(shelter.name), subtitle: Text(subtitle)),
     );
   }
 }

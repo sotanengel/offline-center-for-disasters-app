@@ -41,6 +41,12 @@ void main() {
     expect(loc, isNull);
   });
 
+  test('offlineSttAvailableProvider: 起動時は false（権限ダイアログを出さない）', () async {
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    expect(await container.read(offlineSttAvailableProvider.future), isFalse);
+  });
+
   test('hazardPriorProvider: パック未取得でもフォールバック実装が返る', () async {
     final container = ProviderContainer(
       overrides: [dataPackProvider.overrideWith((ref) async => null)],

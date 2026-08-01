@@ -4,9 +4,10 @@ import '../../domain/entities/guide_card.dart';
 
 /// S-04 ガイド詳細（1 カード 1 画面、§11.2 / §15.2）。
 class GuideDetailScreen extends StatelessWidget {
-  const GuideDetailScreen({super.key, required this.card});
+  const GuideDetailScreen({super.key, required this.card, this.aiSupplement});
 
   final GuideCard card;
+  final String? aiSupplement;
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +36,27 @@ class GuideDetailScreen extends StatelessWidget {
                       fontSize: 20,
                       color: Theme.of(context).colorScheme.onErrorContainer,
                     ),
+                  ),
+                ),
+              ),
+            ],
+            if (aiSupplement != null && aiSupplement!.isNotEmpty) ...[
+              const SizedBox(height: 12),
+              Material(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                borderRadius: BorderRadius.circular(8),
+                child: Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'AI による補足',
+                        style: Theme.of(context).textTheme.labelLarge,
+                      ),
+                      const SizedBox(height: 4),
+                      Text(aiSupplement!, style: const TextStyle(fontSize: 18)),
+                    ],
                   ),
                 ),
               ),

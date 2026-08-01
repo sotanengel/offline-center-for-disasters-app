@@ -8,6 +8,8 @@ import 'package:offline_center_for_disasters/domain/entities/enums.dart';
 import 'package:offline_center_for_disasters/domain/entities/hazard_context.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../helpers/destination_plan_overrides.dart';
+
 /// §15.1 ホーム → 結果の 1 タップ導線 + §20.2 リグレッション。
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -49,6 +51,7 @@ void main() {
           shakeDetectedProvider.overrideWith((ref) => Stream.value(false)),
           recentSelectionProvider.overrideWith((ref) async => null),
           offlineSttAvailableProvider.overrideWith((ref) async => false),
+          destinationPlanProviderOverride(),
         ],
         child: MaterialApp(
           initialRoute: AppRoutes.home,

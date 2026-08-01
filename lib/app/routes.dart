@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../core/geo/geo_point.dart';
-import '../domain/entities/enums.dart';
-import '../domain/entities/guide_card.dart';
+import 'providers.dart';
+import '../../domain/entities/enums.dart';
+import '../../domain/entities/guide_card.dart';
+import '../../domain/entities/situation_slots.dart';
 import '../ui/guide/guide_degrade_screen.dart';
 import '../ui/guide/guide_detail_screen.dart';
 import '../ui/home/home_screen.dart';
@@ -29,35 +30,48 @@ Route<Object?>? onGenerateAppRoute(RouteSettings settings) {
       return MaterialPageRoute(
         settings: settings,
         builder: (context) => HomeScreen(
-          onSelect: (type) {
-            if (type == DisasterType.unknown) {
+          onSelect: (slots) {
+            if (slots.disasterType == DisasterType.unknown &&
+                !slots.needsDisasterTypeConfirmation) {
               Navigator.of(context).pushNamed(AppRoutes.guide);
             } else {
               Navigator.of(
                 context,
-              ).pushNamed(AppRoutes.result, arguments: type);
+              ).pushNamed(AppRoutes.result, arguments: slots);
             }
           },
         ),
       );
     case AppRoutes.result:
-      final type = settings.arguments as DisasterType? ?? DisasterType.unknown;
+      final slots =
+          settings.arguments as SituationSlots? ??
+          const SituationSlots(disasterType: DisasterType.unknown);
       return MaterialPageRoute(
         settings: settings,
-        builder: (_) => ResultScreen(disasterType: type),
+        builder: (_) => ResultScreen(slots: slots),
       );
     case AppRoutes.nav:
       final args = settings.arguments as NavArgs?;
       return MaterialPageRoute(
         settings: settings,
         builder: (_) => NavScreen(
-          origin: args?.origin ?? const GeoPoint(35.68, 139.76),
+          origin: args?.origin ?? kDefaultOrigin,
           route: args?.route,
           fallbackBearing: args?.fallbackBearing ?? false,
         ),
       );
     case AppRoutes.guide:
-      final card = settings.arguments as GuideCard?;
+      final args = settings.arguments;
+      if (args is GuideDetailArgs) {
+        return MaterialPageRoute(
+          settings: settings,
+          builder: (_) => GuideDetailScreen(
+            card: args.card,
+            aiSupplement: args.aiSupplement,
+          ),
+        );
+      }
+      final card = args as GuideCard?;
       return MaterialPageRoute(
         settings: settings,
         builder: (_) => card != null
@@ -77,4 +91,11 @@ Route<Object?>? onGenerateAppRoute(RouteSettings settings) {
     default:
       return null;
   }
+}
+
+/// ガイド詳細画面への引数（AI-4 補足文付き）。
+class GuideDetailArgs {
+  const GuideDetailArgs({required this.card, this.aiSupplement});
+  final GuideCard card;
+  final String? aiSupplement;
 }

@@ -63,6 +63,8 @@
 	<string>現在地から避難所・経路案内を表示するために位置情報を使用します。</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>オフライン音声入力（任意）にマイクを使用します。</string>
+	<key>NSSpeechRecognitionUsageDescription</key>
+	<string>オフライン音声入力（任意）に音声認識を使用します。</string>
 	<key>NSMotionUsageDescription</key>
 	<string>地震の揺れ検知にモーションセンサーを使用します。</string>
 	<key>UISupportedInterfaceOrientations~ipad</key>
