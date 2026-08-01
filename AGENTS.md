@@ -57,6 +57,20 @@ tool/sim/record.sh stop
 4. 自動シナリオは `integration_test/` に追加し、`flutter test integration_test -d <UDID>` で実行する。
 5. 実機相当の性能下限は iPhone SE（第3世代）を使って再現する。
 
+## データパック生成（tools/）
+
+```bash
+source tools/env.sh                 # Takumi Guard ミラーを uv に設定（必須）
+cd tools && uv sync                 # 依存インストール
+uv run pytest                       # パイプラインのユニットテスト
+uv run python -m packgen.build_pack --region tokyo   # 1県分のパック生成
+uv run python -m packgen.build_pack --all            # 4県一括
+uv run python -m packgen.validate_pack out/tokyo/pack.sqlite
+```
+
+- 生データキャッシュは `tools/data/`、生成物は `tools/out/<region>/pack.sqlite`。
+- `osmium-tool`（brew）が必要。巨大ダウンロード（OSM 全国 PBF 約 2.5GB）は初回のみ。
+
 ## ディレクトリ構成（要件定義書 §18 準拠）
 
 - `lib/app/` … ルーティング、テーマ、DI
