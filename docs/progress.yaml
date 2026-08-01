@@ -107,7 +107,8 @@ prs:
       出ない問題を修正する。
   - id: PR-18
     title: F-09 S-03 経路案内に道路グラフ Polyline 描画を追加
-    status: in_progress
+    status: done
+    pr: 28
     features_covered: [F-09]
     note: >-
       NavScreen が経路 polyline のみ描画し道路網が表示されなかった。
@@ -116,7 +117,8 @@ prs:
 
   - id: PR-19
     title: アプリ同梱データパック（東京）初回展開
-    status: in_progress
+    status: done
+    pr: 28
     features_covered: [F-10]
     note: >-
       リリースビルドに tokyo pack.sqlite を assets 同梱し、初回起動時に
