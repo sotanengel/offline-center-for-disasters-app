@@ -188,6 +188,7 @@ features:
     phase: P1
     status: done
     pr: [5, 18]
+    notes: 実機配置は tool/device/install_pack.sh（devicectl）
   - id: F-11
     title: 初回セットアップ（免責同意、地域パック取得、権限要求）
     spec_ref: "§15"

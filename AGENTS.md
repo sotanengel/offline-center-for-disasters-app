@@ -45,6 +45,10 @@ tool/sim/screenshot.sh screenshots
 # シミュレータの画面録画
 tool/sim/record.sh start out.mov
 tool/sim/record.sh stop
+
+# 実機へアプリ + データパックを配置（USB 接続・Developer Mode 必須）
+flutter build ios --release && flutter install -d <UDID> --release
+tool/device/install_pack.sh tokyo <UDID>
 ```
 
 ## iPhone 動作テストの流れ（AI エージェント用）

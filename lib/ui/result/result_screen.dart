@@ -212,7 +212,9 @@ class _DestinationSummary extends StatelessWidget {
         key: Key('destination_summary'),
         child: ListTile(
           title: Text('データパック未配置'),
-          subtitle: Text('tool/sim/install_pack.sh で東京パックをインストールしてください'),
+          subtitle: Text(
+            'tool/device/install_pack.sh（実機）または tool/sim/install_pack.sh（シミュレータ）で東京パックを配置してください',
+          ),
         ),
       );
     }
