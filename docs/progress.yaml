@@ -97,6 +97,7 @@ prs:
   - id: PR-17
     title: 県境マルチパック同時利用と位置情報権限ダイアログ（F-10 / F-11）
     status: in_progress
+    pr: 25
     features_covered: [F-10, F-11]
     note: >-
       currentRegionProvider が tokyo 固定で県境では片県しか使えなかった。
