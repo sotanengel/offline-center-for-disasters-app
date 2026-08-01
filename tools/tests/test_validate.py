@@ -55,6 +55,72 @@ def test_orphan_edges_fail(tmp_path):
     assert any("edges" in e for e in report["errors"])
 
 
+def test_empty_hazard_grid_fails(tmp_path):
+    """hazard_grid が空のパックは NG（P0 で東京パックが 0 セルだった回帰）。"""
+    db = _minimal_pack(tmp_path)
+    with db:
+        db.execute("DELETE FROM hazard_grid")
+    db.close()
+    report = validate_pack(tmp_path / "pack.sqlite")
+    assert report["ok"] is False
+    assert any("hazard_grid" in e for e in report["errors"])
+
+
+def test_high_elevation_null_rate_fails(tmp_path):
+    """nodes.elevation_m の NULL 率が閾値を超えたら NG。"""
+    db = _minimal_pack(tmp_path)
+    with db:
+        db.execute("UPDATE nodes SET elevation_m = NULL")
+    db.close()
+    report = validate_pack(
+        tmp_path / "pack.sqlite", elevation_null_rate_threshold=0.1
+    )
+    assert report["ok"] is False
+    assert any("elevation_m" in e for e in report["errors"])
+
+
+def test_allowed_missing_hazard_kinds(tmp_path):
+    """埼玉のように高潮/津波データが無い県では allowed_missing 指定で pass。"""
+    db = _minimal_pack(tmp_path)
+    with db:
+        db.execute("UPDATE nodes SET elevation_m = 10.0")
+        db.execute("UPDATE shelters SET elevation_m = 10.0")
+        # 洪水・土砂は埼玉にもあるので登録
+        db.execute(
+            "INSERT INTO hazard_grid (cell_id, landslide_class) VALUES (2, 2)"
+        )
+    db.close()
+    report = validate_pack(
+        tmp_path / "pack.sqlite",
+        elevation_null_rate_threshold=0.1,
+        allowed_missing_hazards=["storm_surge", "tsunami", "volcano"],
+    )
+    assert report["ok"] is True, report["errors"]
+
+
+def test_tokyo_auto_allowed_missing_via_metadata(tmp_path):
+    """metadata.region=tokyo では tsunami/volcano 欠損を CLI 既定で許容。"""
+    db = _minimal_pack(tmp_path)
+    with db:
+        db.execute("UPDATE nodes SET elevation_m = 10.0")
+        db.execute("UPDATE shelters SET elevation_m = 10.0")
+        db.execute(
+            "INSERT INTO hazard_grid (cell_id, landslide_class, storm_surge_m)"
+            " VALUES (2, 2, 0.5)"
+        )
+    db.close()
+    from packgen.validate_pack import _allowed_missing_for_pack
+
+    allowed = _allowed_missing_for_pack(tmp_path / "pack.sqlite")
+    assert set(allowed or []) == {"tsunami", "volcano"}
+    report = validate_pack(
+        tmp_path / "pack.sqlite",
+        elevation_null_rate_threshold=0.1,
+        allowed_missing_hazards=allowed,
+    )
+    assert report["ok"] is True, report["errors"]
+
+
 def test_all_hazard_flag_consistency(tmp_path):
     db = _minimal_pack(tmp_path)
     with db:

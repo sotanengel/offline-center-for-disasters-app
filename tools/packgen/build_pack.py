@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import logging
 import sqlite3
 import subprocess
 import sys
@@ -17,7 +18,11 @@ import zipfile
 from datetime import datetime, timezone
 from pathlib import Path
 
+import requests
+
 from packgen.config import (
+    ALLOWED_MISSING_HAZARDS,
+    DEM_PREFLIGHT_URL,
     ELEVATION_SOURCE,
     HAZARD_SERIES,
     OSM_PBF_URL,
@@ -25,6 +30,7 @@ from packgen.config import (
     REGIONS,
     SHELTERS_SOURCE,
     SHELTERS_URL,
+    STORM_SURGE_SERIES,
     TSUNAMI_SERIES,
     Region,
     hazard_url,
@@ -48,9 +54,34 @@ TOOLS_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = TOOLS_DIR / "data"
 OUT_DIR = TOOLS_DIR / "out"
 
+# 標高取得の失敗率上限（超えたらビルド NG）
+ELEVATION_FAILURE_RATE_THRESHOLD = 0.10
+# 標高 NULL 率の上限（validate_pack で検査）
+ELEVATION_NULL_RATE_THRESHOLD = 0.10
+
+logging.basicConfig(
+    format="%(asctime)s %(levelname)s %(name)s: %(message)s",
+    level=logging.INFO,
+)
+logger = logging.getLogger("packgen.build")
+
 
 def log(msg: str) -> None:
     print(f"[{datetime.now().strftime('%H:%M:%S')}] {msg}", flush=True)
+
+
+def preflight_dem() -> None:
+    """DEM タイル配信サーバへの疎通を確認する（1 タイルだけ取得）。"""
+    log(f"標高タイル疎通確認: {DEM_PREFLIGHT_URL}")
+    try:
+        resp = requests.get(DEM_PREFLIGHT_URL, timeout=15)
+    except requests.RequestException as e:
+        raise RuntimeError(f"DEM プリフライト失敗（ネットワーク不可）: {e}") from e
+    if resp.status_code >= 400:
+        raise RuntimeError(
+            f"DEM プリフライト失敗: HTTP {resp.status_code} ({DEM_PREFLIGHT_URL})"
+        )
+    log(f"DEM プリフライト OK（{len(resp.content)} bytes）")
 
 
 def ensure_osm_extract(region: Region) -> Path:
@@ -84,7 +115,9 @@ def _gml_files(zip_path: Path, dest_dir: Path) -> list[Path]:
     return sorted(p for p in dest_dir.rglob("*") if p.suffix.lower() in (".xml", ".gml"))
 
 
-def _fill_elevations(db: sqlite3.Connection, provider: ElevationProvider, region: Region):
+def _fill_elevations(
+    db: sqlite3.Connection, provider: ElevationProvider, region: Region
+) -> None:
     """shelters / nodes / hazard_grid の elevation_m をバッチで埋める。"""
     targets = [
         ("shelters", "rowid"),
@@ -93,7 +126,9 @@ def _fill_elevations(db: sqlite3.Connection, provider: ElevationProvider, region
     ]
     for table, idcol in targets:
         if table == "hazard_grid":
-            rows = db.execute(f"SELECT {idcol} FROM {table} WHERE elevation_m IS NULL").fetchall()
+            rows = db.execute(
+                f"SELECT {idcol} FROM {table} WHERE elevation_m IS NULL"
+            ).fetchall()
             points = []
             ids = []
             from packgen.hazard import cell_center
@@ -121,7 +156,12 @@ def _fill_elevations(db: sqlite3.Connection, provider: ElevationProvider, region
                     ((v, k) for k, v in zip(sub_ids, values) if v is not None),
                 )
             done += len(sub_ids)
-            log(f"{region.key}: {table} 標高 {done}/{len(ids)}")
+            log(
+                f"{region.key}: {table} 標高 {done}/{len(ids)} "
+                f"(fetch success={provider.success_count} "
+                f"fail={provider.failure_count} "
+                f"missing={provider.missing_count})"
+            )
 
 
 def _apply_edge_hazards(db: sqlite3.Connection) -> int:
@@ -134,7 +174,10 @@ def _apply_edge_hazards(db: sqlite3.Connection) -> int:
         grid[row[0]] = row[1:]
     if not grid:
         return 0
-    nodes = dict(db.execute("SELECT id, lat, lng FROM nodes"))
+    nodes = {
+        r[0]: (r[1], r[2])
+        for r in db.execute("SELECT id, lat, lng FROM nodes")
+    }
 
     def depth_class(m: float | None) -> int:
         if not m or m <= 0:
@@ -176,6 +219,34 @@ def _apply_edge_hazards(db: sqlite3.Connection) -> int:
     return updated
 
 
+def _download_and_import_hazard(
+    db: sqlite3.Connection,
+    dataset: str,
+    series: str,
+    label: str,
+    pref_code: str,
+    importer,
+    kind: str,
+    notes: list[str],
+    sources: list[str],
+    region_key: str,
+) -> int:
+    zip_path = DATA_DIR / "hazard" / f"{series}_{pref_code}.zip"
+    try:
+        if not zip_path.exists():
+            download(hazard_url(dataset, series, pref_code), zip_path)
+    except DownloadError as e:
+        notes.append(f"{kind}: 取得失敗（{e}）")
+        return 0
+    dest = DATA_DIR / "hazard" / f"{series}_{pref_code}"
+    cells = 0
+    for gml in _gml_files(zip_path, dest):
+        cells += importer(db, gml)
+    log(f"{region_key}: {kind} グリッド {cells} セル")
+    sources.append(label)
+    return cells
+
+
 def build_region(region: Region, *, skip_download: bool = False) -> dict:
     out_dir = OUT_DIR / region.key
     out_dir.mkdir(parents=True, exist_ok=True)
@@ -205,43 +276,45 @@ def build_region(region: Region, *, skip_download: bool = False) -> dict:
     sources.append(OSM_SOURCE)
 
     # 3. ハザードグリッド
+    # 3-1. 全県共通（洪水・土砂）
     hazard_importers = {
         "flood": import_flood_gml,
         "landslide": import_landslide_gml,
-        "storm_surge": import_storm_surge_gml,
     }
     for kind, (dataset, series, label) in HAZARD_SERIES.items():
-        zip_path = DATA_DIR / "hazard" / f"{series}_{region.pref_code}.zip"
-        try:
-            if not zip_path.exists():
-                download(hazard_url(dataset, series, region.pref_code), zip_path)
-        except DownloadError as e:
-            notes.append(f"{kind}: 取得失敗（{e}）")
-            continue
-        cells = 0
-        for gml in _gml_files(zip_path, DATA_DIR / "hazard" / f"{series}_{region.pref_code}"):
-            cells += hazard_importers[kind](db, gml)
-        log(f"{region.key}: {kind} グリッド {cells} セル")
-        sources.append(label)
+        _download_and_import_hazard(
+            db, dataset, series, label, region.pref_code,
+            hazard_importers[kind], kind, notes, sources, region.key,
+        )
+    # 3-2. 高潮（A49、県別シリーズ）
+    if region.key in STORM_SURGE_SERIES:
+        dataset, series, label = STORM_SURGE_SERIES[region.key]
+        _download_and_import_hazard(
+            db, dataset, series, label, region.pref_code,
+            import_storm_surge_gml, "storm_surge", notes, sources, region.key,
+        )
+    else:
+        notes.append("storm_surge: 国土数値情報に当該県の高潮データ無し（0 埋め）")
+    # 3-3. 津波（A40、県別シリーズ）
     if region.key in TSUNAMI_SERIES:
         dataset, series, label = TSUNAMI_SERIES[region.key]
-        zip_path = DATA_DIR / "hazard" / f"{series}_{region.pref_code}.zip"
-        try:
-            if not zip_path.exists():
-                download(hazard_url(dataset, series, region.pref_code), zip_path)
-            cells = 0
-            for gml in _gml_files(zip_path, DATA_DIR / "hazard" / f"{series}_{region.pref_code}"):
-                cells += import_tsunami_gml(db, gml)
-            log(f"{region.key}: tsunami グリッド {cells} セル")
-            sources.append(label)
-        except DownloadError as e:
-            notes.append(f"tsunami: 取得失敗（{e}）")
+        _download_and_import_hazard(
+            db, dataset, series, label, region.pref_code,
+            import_tsunami_gml, "tsunami", notes, sources, region.key,
+        )
     else:
-        notes.append("tsunami: 国土数値情報に当該県のデータ無し（グリッドは 0 埋め）")
+        notes.append("tsunami: 国土数値情報に当該県のデータ無し（0 埋め）")
 
     # 4. 標高
     provider = ElevationProvider(DATA_DIR / "dem")
     _fill_elevations(db, provider, region)
+    stats = provider.stats()
+    log(f"{region.key}: 標高取得統計 {stats}")
+    if stats["failure_rate"] > ELEVATION_FAILURE_RATE_THRESHOLD:
+        raise RuntimeError(
+            f"{region.key}: 標高タイル取得失敗率 {stats['failure_rate']:.1%} が閾値 "
+            f"{ELEVATION_FAILURE_RATE_THRESHOLD:.0%} を超過しました。ネットワーク/エンドポイント要確認。"
+        )
     sources.append(ELEVATION_SOURCE)
 
     # 5. 避難所 → 最近傍ノード
@@ -264,13 +337,19 @@ def build_region(region: Region, *, skip_download: bool = False) -> dict:
                 ("sources", json.dumps(sources, ensure_ascii=False)),
                 ("notes", json.dumps(notes, ensure_ascii=False)),
                 ("bbox", json.dumps(region.bbox)),
+                ("elevation_stats", json.dumps(stats)),
             ],
         )
     db.commit()
     db.close()
 
-    report = validate_pack(pack)
+    report = validate_pack(
+        pack,
+        elevation_null_rate_threshold=ELEVATION_NULL_RATE_THRESHOLD,
+        allowed_missing_hazards=list(ALLOWED_MISSING_HAZARDS.get(region.key, ())),
+    )
     report["notes"] = notes
+    report["elevation_fetch_stats"] = stats
     (out_dir / "report.json").write_text(
         json.dumps(report, ensure_ascii=False, indent=2)
     )
@@ -282,10 +361,17 @@ def main(argv: list[str]) -> int:
     parser = argparse.ArgumentParser(description="地域データパック生成")
     parser.add_argument("--region", choices=sorted(REGIONS), help="対象県")
     parser.add_argument("--all", action="store_true", help="全県生成")
+    parser.add_argument(
+        "--skip-dem-preflight", action="store_true",
+        help="DEM 疎通チェックをスキップ（オフラインテスト用）",
+    )
     args = parser.parse_args(argv)
 
     if not args.all and not args.region:
         parser.error("--region または --all を指定してください")
+
+    if not args.skip_dem_preflight:
+        preflight_dem()
 
     keys = sorted(REGIONS) if args.all else [args.region]
     ok = True

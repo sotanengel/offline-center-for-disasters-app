@@ -54,6 +54,7 @@ phases:
     spec_ref: "§19"
     status: done
     pr: 2
+    notes: "Issue #8 で GML パーサ修正・4県再生成完了"
   - id: P1
     title: "決定論コア: DestinationPolicy + ShelterFinder + RouteEngine + ターンバイターン"
     spec_ref: "§19"
@@ -156,32 +157,40 @@ features:
     status: pending
     pr: null
 
-# 地域データパック生成状況（PR-2 で作成 → PR-8 で再生成）
+# 地域データパック生成状況（Issue #8 で再生成完了 2026-08-01）
 data_packs:
   - region: tokyo
-    shelters: in_progress
-    road_graph: in_progress
-    hazard_grid: in_progress
-    elevation: in_progress
-    notes: "PR-8 でハザード GML パーサ修正・A49高潮採用・DEM欠損検出強化のうえ再生成中"
+    shelters: done
+    road_graph: done
+    hazard_grid: done
+    elevation: done
+    notes: >-
+      flood=83812 landslide=39847 storm_surge=13627 tsunami=0 volcano=0(許容)
+      nodes_elev_null=1.8% shelters=2269 validate=ok
   - region: chiba
-    shelters: in_progress
-    road_graph: in_progress
-    hazard_grid: in_progress
-    elevation: in_progress
-    notes: "PR-8 で再生成中"
+    shelters: done
+    road_graph: done
+    hazard_grid: done
+    elevation: done
+    notes: >-
+      flood=216964 tsunami=25017 landslide=20774 storm_surge=18664 volcano=0(許容)
+      nodes_elev_null=2.1% shelters=2918 validate=ok
   - region: saitama
-    shelters: in_progress
-    road_graph: in_progress
-    hazard_grid: in_progress
-    elevation: in_progress
-    notes: "PR-8 で再生成中。埼玉は内陸のため高潮(A49)データ提供無し（0埋め許容）"
+    shelters: done
+    road_graph: done
+    hazard_grid: done
+    elevation: done
+    notes: >-
+      flood=434926 landslide=30471 storm_surge=0 tsunami=0 volcano=0(許容)
+      nodes_elev_null=0.3% shelters=2858 validate=ok
   - region: kanagawa
-    shelters: in_progress
-    road_graph: in_progress
-    hazard_grid: in_progress
-    elevation: in_progress
-    notes: "PR-8 で再生成中"
+    shelters: done
+    road_graph: done
+    hazard_grid: done
+    elevation: done
+    notes: >-
+      flood=80367 tsunami=11406 landslide=73538 storm_surge=11032 volcano=0(許容)
+      nodes_elev_null=0.1% shelters=3339 validate=ok
 
 # LLM モデル（§7.1）。PR-10 で選択 UI を実装、推論統合は P5
 llm_models:
