@@ -75,8 +75,8 @@ prs:
     features_covered: [F-02, F-03, F-04]
   - id: PR-15
     title: LFM2.5 実推論 integration/unit テスト（real_llm タグ）
-    status: in_progress
-    pr: null
+    status: done
+    pr: 23
     features_covered: [F-02]
 
 # 要件定義書 §19 の実装フェーズ
