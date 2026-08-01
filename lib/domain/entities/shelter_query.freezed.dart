@@ -15,7 +15,7 @@ T _$identity<T>(T value) => value;
 mixin _$ShelterQuery {
 
  DisasterType get disasterType;/// 津波: 想定浸水深 + 5m（§4.2 required_elevation_m）
- double get minElevationM;/// 初期探索半径 [km]（§4.4: 0 件なら 10km に拡大）
+ double get minElevationM;/// 初期探索半径 [km]（§4.4 / Q10: 0 件なら 20km に拡大）
  double get radiusKm;
 /// Create a copy of ShelterQuery
 /// with the given fields replaced by the non-null parameter values.
@@ -210,13 +210,13 @@ return $default(_that.disasterType,_that.minElevationM,_that.radiusKm);case _:
 
 
 class _ShelterQuery extends ShelterQuery {
-  const _ShelterQuery({required this.disasterType, this.minElevationM = 0, this.radiusKm = 3.0}): super._();
+  const _ShelterQuery({required this.disasterType, this.minElevationM = 0, this.radiusKm = 10.0}): super._();
   
 
 @override final  DisasterType disasterType;
 /// 津波: 想定浸水深 + 5m（§4.2 required_elevation_m）
 @override@JsonKey() final  double minElevationM;
-/// 初期探索半径 [km]（§4.4: 0 件なら 10km に拡大）
+/// 初期探索半径 [km]（§4.4 / Q10: 0 件なら 20km に拡大）
 @override@JsonKey() final  double radiusKm;
 
 /// Create a copy of ShelterQuery

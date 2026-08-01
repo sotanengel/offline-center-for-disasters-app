@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:offline_center_for_disasters/app/providers.dart';
 import 'package:offline_center_for_disasters/core/geo/geo_point.dart';
 import 'package:offline_center_for_disasters/data/routing/road_graph.dart';
@@ -10,6 +11,7 @@ import 'package:offline_center_for_disasters/ui/nav/nav_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../helpers/fake_evacuation_pack.dart';
+import '../../helpers/fake_location_service.dart';
 
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
@@ -24,17 +26,23 @@ void main() {
     instructions: const [],
   );
 
-  Future<void> pumpNav(WidgetTester tester, {RoadGraph? graph}) async {
+  Future<void> pumpNav(
+    WidgetTester tester, {
+    RoadGraph? graph,
+    FakeLocationService? location,
+  }) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     final pack = FakeEvacuationPack(
       graph: graph ?? sampleRoadGraphForNavTest(),
     );
+    final fakeLocation = location ?? FakeLocationService();
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           dataPackProvider.overrideWith((ref) async => pack),
+          locationServiceProvider.overrideWithValue(fakeLocation),
         ],
         child: MaterialApp(
           home: NavScreen(origin: origin, route: route),
@@ -67,5 +75,19 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.byType(PolylineLayer), findsOneWidget);
+  });
+
+  testWidgets('位置更新で残距離表示が変わる', (tester) async {
+    final fakeLocation = FakeLocationService(
+      permission: LocationPermission.whileInUse,
+    );
+    await pumpNav(tester, location: fakeLocation);
+    final before = find.textContaining('残り');
+    expect(before, findsOneWidget);
+
+    fakeLocation.emitPosition(GeoPointPosition(dest.lat, dest.lng));
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('残り 0.0 km'), findsOneWidget);
   });
 }

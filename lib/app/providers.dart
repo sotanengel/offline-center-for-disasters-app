@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -41,6 +42,7 @@ import '../data/pack/pack_source.dart';
 import '../domain/services/guidance_service.dart';
 import '../data/rule/rule_situation_analyzer.dart';
 import '../domain/services/situation_analyzer.dart';
+import '../domain/usecases/destination_plan_progress.dart';
 import '../domain/usecases/destination_planner.dart';
 
 /// シミュレータ / 統合テスト想定の現在地（江東区付近）。
@@ -99,6 +101,32 @@ final locationProvider = FutureProvider<GeoPoint?>((ref) async {
   }
 });
 
+/// 案内中の現在地更新用ストリーム（権限なし・GPS 無効時は空）。
+final positionStreamProvider = StreamProvider<GeoPoint?>((ref) async* {
+  try {
+    final location = ref.watch(locationServiceProvider);
+    if (!await location.isLocationServiceEnabled()) return;
+    var perm = await location.checkPermission();
+    if (perm == LocationPermission.denied) {
+      perm = await location.requestPermission();
+    }
+    if (perm == LocationPermission.denied ||
+        perm == LocationPermission.deniedForever) {
+      return;
+    }
+    yield* location
+        .getPositionStream(
+          locationSettings: const LocationSettings(
+            accuracy: LocationAccuracy.medium,
+            distanceFilter: 5,
+          ),
+        )
+        .map((pos) => GeoPoint(pos.latitude, pos.longitude));
+  } catch (_) {
+    return;
+  }
+});
+
 // ---------------------------------------------------------------------------
 // データパック
 // ---------------------------------------------------------------------------
@@ -121,7 +149,7 @@ final installedPackInfosProvider = FutureProvider<List<RegionPackInfo>>((
   }
 });
 
-/// 現在地周辺（§4.4 拡大半径 10km）と交差するパックを開いた [EvacuationPack]。
+/// 現在地周辺（§4.4 / Q10 拡大半径 20km）と交差するパックを開いた [EvacuationPack]。
 /// 未配置 / 破損時は null で縮退する (§12)。
 final dataPackProvider = FutureProvider<EvacuationPack?>((ref) async {
   final infos = await ref.watch(installedPackInfosProvider.future);
@@ -203,21 +231,45 @@ final shelterFinderProvider = FutureProvider<EvacuationPack?>((ref) async {
 
 /// S-02: 避難先候補 + 経路プレビュー（§9.1）。
 final destinationPlanProvider =
-    FutureProvider.family<DestinationPlan, SituationSlots>((ref, slots) async {
-      final loc = await ref.watch(locationProvider.future) ?? kDefaultOrigin;
-      final pack = await ref.watch(dataPackProvider.future);
-      // グラフは避難先が決まってから、その範囲だけ読む（§16.1）。
-      return const DestinationPlanner().plan(
+    NotifierProvider.family<
+      DestinationPlanNotifier,
+      DestinationPlanState,
+      SituationSlots
+    >(DestinationPlanNotifier.new);
+
+class DestinationPlanNotifier
+    extends FamilyNotifier<DestinationPlanState, SituationSlots> {
+  @override
+  DestinationPlanState build(SituationSlots slots) {
+    unawaited(_load(slots));
+    return const DestinationPlanLoading(DestinationPlanProgress.preparing);
+  }
+
+  Future<void> _load(SituationSlots slots) async {
+    try {
+      final loc = await ref.read(locationProvider.future) ?? kDefaultOrigin;
+      final pack = await ref.read(dataPackProvider.future);
+      final plan = await const DestinationPlanner().plan(
         slots: slots,
         origin: loc,
         pack: pack,
+        onProgress: (progress) {
+          if (state is! DestinationPlanReady) {
+            state = DestinationPlanLoading(progress);
+          }
+        },
         routeEngineFactory: (bounds) async {
           if (pack == null) return null;
           final graph = await pack.loadGraph(bounds: bounds);
           return GraphRouteEngine(nodes: graph.nodes, edges: graph.edges);
         },
       );
-    });
+      state = DestinationPlanReady(plan);
+    } catch (e) {
+      state = DestinationPlanFailed(e);
+    }
+  }
+}
 
 // ---------------------------------------------------------------------------
 // センサ / STT / 一言入力

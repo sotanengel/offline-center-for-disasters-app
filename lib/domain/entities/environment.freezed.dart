@@ -212,7 +212,7 @@ return $default(_that.place,_that.floor,_that.buildingType,_that.trapped,_that.w
 
 class _Environment implements Environment {
   const _Environment({this.place = PlaceType.unknown, this.floor, this.buildingType = BuildingType.unknown, this.trapped = false, this.waterLevel = WaterLevel.unknown, this.canMove = true});
-
+  
 
 @override@JsonKey() final  PlaceType place;
 @override final  int? floor;

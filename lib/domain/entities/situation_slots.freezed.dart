@@ -82,7 +82,7 @@ as SlotSource,
 @override
 @pragma('vm:prefer-inline')
 $UserStateCopyWith<$Res> get userState {
-
+  
   return $UserStateCopyWith<$Res>(_self.userState, (value) {
     return _then(_self.copyWith(userState: value));
   });
@@ -91,7 +91,7 @@ $UserStateCopyWith<$Res> get userState {
 @override
 @pragma('vm:prefer-inline')
 $EnvironmentCopyWith<$Res> get environment {
-
+  
   return $EnvironmentCopyWith<$Res>(_self.environment, (value) {
     return _then(_self.copyWith(environment: value));
   });
@@ -234,7 +234,7 @@ return $default(_that.intent,_that.disasterType,_that.disasterTypeEvidence,_that
 
 class _SituationSlots extends SituationSlots {
   const _SituationSlots({this.intent = Intent.unknown, this.disasterType = DisasterType.unknown, this.disasterTypeEvidence = '', this.urgency = Urgency.unknown, this.userState = const UserState(), this.environment = const Environment(), final  List<String> guideTags = const <String>[], this.source = SlotSource.tile}): _guideTags = guideTags,super._();
-
+  
 
 @override@JsonKey() final  Intent intent;
 @override@JsonKey() final  DisasterType disasterType;
@@ -319,7 +319,7 @@ as SlotSource,
 @override
 @pragma('vm:prefer-inline')
 $UserStateCopyWith<$Res> get userState {
-
+  
   return $UserStateCopyWith<$Res>(_self.userState, (value) {
     return _then(_self.copyWith(userState: value));
   });
@@ -328,7 +328,7 @@ $UserStateCopyWith<$Res> get userState {
 @override
 @pragma('vm:prefer-inline')
 $EnvironmentCopyWith<$Res> get environment {
-
+  
   return $EnvironmentCopyWith<$Res>(_self.environment, (value) {
     return _then(_self.copyWith(environment: value));
   });

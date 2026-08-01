@@ -25,7 +25,7 @@ void main() {
   tearDown(() => db.close());
 
   group('半径・件数', () {
-    test('半径 3km 内の避難所のみ返る（圏外は除外）', () async {
+    test('半径 10km 内の避難所のみ返る（圏外は除外）', () async {
       await seed(() async {
         // 約 1.1km 北
         await insertShelter(
@@ -36,12 +36,12 @@ void main() {
           lng: 139.0,
           okVolcano: 1,
         );
-        // 約 5.5km 北
+        // 約 12km 北（10km 圏外）
         await insertShelter(
           db,
           rowid: 2,
           id: 'far',
-          lat: 35.05,
+          lat: 35.11,
           lng: 139.0,
           okVolcano: 1,
         );
@@ -54,13 +54,13 @@ void main() {
       expect(r.expandedRadius, isFalse);
     });
 
-    test('§4.4: 3km で 0 件なら 10km に拡大して再探索する', () async {
+    test('§4.4 / Q10: 10km で 0 件なら 20km に拡大して再探索する', () async {
       await seed(() async {
         await insertShelter(
           db,
           rowid: 1,
           id: 'far',
-          lat: 35.05,
+          lat: 35.11,
           lng: 139.0,
           okVolcano: 1,
         );
@@ -73,13 +73,13 @@ void main() {
       expect(r.expandedRadius, isTrue);
     });
 
-    test('10km でも 0 件なら空を返す（避難先を断定しない）', () async {
+    test('20km でも 0 件なら空を返す（避難先を断定しない）', () async {
       await seed(() async {
         await insertShelter(
           db,
           rowid: 1,
           id: 'too-far',
-          lat: 35.2,
+          lat: 35.22,
           lng: 139.0,
           okVolcano: 1,
         );
