@@ -1,0 +1,1785 @@
+{
+  "guides": [
+    {
+      "id": "gp_higher_ground",
+      "title": "より高い場所へ",
+      "disasterTypes": [
+        "tsunami",
+        "flood",
+        "stormSurge"
+      ],
+      "tags": [
+        "general",
+        "principle"
+      ],
+      "priority": 1,
+      "steps": [
+        "浸水や津波の恐れがあるときは、できるだけ高い場所へ移動する",
+        "河川や海に近い低地は避ける",
+        "公式の避難情報を確認する"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "gp_sturdy_building",
+      "title": "頑丈な建物の高い階へ",
+      "disasterTypes": [
+        "tsunami",
+        "flood"
+      ],
+      "tags": [
+        "general",
+        "principle",
+        "vertical"
+      ],
+      "steps": [
+        "外に出られない場合は頑丈な建物の3階以上を目指す",
+        "エレベーターは使わない",
+        "窓から離れ構造部に近づく"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "gp_away_hazard",
+      "title": "崖・川・海から離れる",
+      "disasterTypes": [
+        "landslide",
+        "flood",
+        "tsunami"
+      ],
+      "tags": [
+        "general",
+        "principle"
+      ],
+      "steps": [
+        "崖・急斜面・河川の近くから離れる",
+        "海岸や堤防から離れる",
+        "土砂や流木の危険がある場所を避ける"
+      ],
+      "source": "消防庁 避難のポイント https://www.fdma.go.jp/publication/rescue/post-4.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "gp_falling_objects",
+      "title": "屋外の落下物から離れる",
+      "disasterTypes": [
+        "earthquake",
+        "volcano"
+      ],
+      "tags": [
+        "general",
+        "principle"
+      ],
+      "steps": [
+        "看板・ガラス・ブロック塀など落下の恐れがある場所を避ける",
+        "建物の外壁に沿って歩かない",
+        "頭を守る"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_001",
+      "title": "地震時の基本行動（1）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 11,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_002",
+      "title": "津波時の基本行動（2）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 12,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_003",
+      "title": "洪水時の基本行動（3）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 13,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_004",
+      "title": "土砂時の基本行動（4）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 14,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_005",
+      "title": "高潮時の基本行動（5）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 15,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_006",
+      "title": "火災時の基本行動（6）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 16,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_007",
+      "title": "噴火時の基本行動（7）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 17,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_008",
+      "title": "地震時の基本行動（8）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 18,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_009",
+      "title": "津波時の基本行動（9）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 19,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_010",
+      "title": "洪水時の基本行動（10）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 20,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_011",
+      "title": "土砂時の基本行動（11）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 21,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_012",
+      "title": "高潮時の基本行動（12）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 22,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_013",
+      "title": "火災時の基本行動（13）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 23,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_014",
+      "title": "噴火時の基本行動（14）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 24,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_015",
+      "title": "地震時の基本行動（15）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 25,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_016",
+      "title": "津波時の基本行動（16）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 26,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_017",
+      "title": "洪水時の基本行動（17）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 27,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_018",
+      "title": "土砂時の基本行動（18）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 28,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_019",
+      "title": "高潮時の基本行動（19）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 29,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_020",
+      "title": "火災時の基本行動（20）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 10,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_021",
+      "title": "噴火時の基本行動（21）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 11,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_022",
+      "title": "地震時の基本行動（22）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 12,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_023",
+      "title": "津波時の基本行動（23）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 13,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_024",
+      "title": "洪水時の基本行動（24）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 14,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_025",
+      "title": "土砂時の基本行動（25）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 15,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_026",
+      "title": "高潮時の基本行動（26）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 16,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_027",
+      "title": "火災時の基本行動（27）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 17,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_028",
+      "title": "噴火時の基本行動（28）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 18,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_029",
+      "title": "地震時の基本行動（29）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 19,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_030",
+      "title": "津波時の基本行動（30）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 20,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_031",
+      "title": "洪水時の基本行動（31）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 21,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_032",
+      "title": "土砂時の基本行動（32）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 22,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_033",
+      "title": "高潮時の基本行動（33）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 23,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_034",
+      "title": "火災時の基本行動（34）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 24,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_035",
+      "title": "噴火時の基本行動（35）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 25,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_036",
+      "title": "地震時の基本行動（36）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 26,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_037",
+      "title": "津波時の基本行動（37）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 27,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_038",
+      "title": "洪水時の基本行動（38）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 28,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_039",
+      "title": "土砂時の基本行動（39）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 29,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_040",
+      "title": "高潮時の基本行動（40）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 10,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_041",
+      "title": "火災時の基本行動（41）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 11,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_042",
+      "title": "噴火時の基本行動（42）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 12,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_043",
+      "title": "地震時の基本行動（43）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 13,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_044",
+      "title": "津波時の基本行動（44）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 14,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_045",
+      "title": "洪水時の基本行動（45）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 15,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_046",
+      "title": "土砂時の基本行動（46）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 16,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_047",
+      "title": "高潮時の基本行動（47）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 17,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_048",
+      "title": "火災時の基本行動（48）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 18,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_049",
+      "title": "噴火時の基本行動（49）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 19,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_050",
+      "title": "地震時の基本行動（50）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 20,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_051",
+      "title": "津波時の基本行動（51）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 21,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_052",
+      "title": "洪水時の基本行動（52）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 22,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_053",
+      "title": "土砂時の基本行動（53）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 23,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_054",
+      "title": "高潮時の基本行動（54）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 24,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_055",
+      "title": "火災時の基本行動（55）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 25,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_056",
+      "title": "噴火時の基本行動（56）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 26,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_057",
+      "title": "地震時の基本行動（57）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 27,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_058",
+      "title": "津波時の基本行動（58）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 28,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_059",
+      "title": "洪水時の基本行動（59）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 29,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_060",
+      "title": "土砂時の基本行動（60）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 10,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_061",
+      "title": "高潮時の基本行動（61）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 11,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_062",
+      "title": "火災時の基本行動（62）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 12,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_063",
+      "title": "噴火時の基本行動（63）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 13,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_064",
+      "title": "地震時の基本行動（64）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 14,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_065",
+      "title": "津波時の基本行動（65）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 15,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_066",
+      "title": "洪水時の基本行動（66）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 16,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_067",
+      "title": "土砂時の基本行動（67）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 17,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_068",
+      "title": "高潮時の基本行動（68）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 18,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_069",
+      "title": "火災時の基本行動（69）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 19,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_070",
+      "title": "噴火時の基本行動（70）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 20,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_071",
+      "title": "地震時の基本行動（71）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 21,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_072",
+      "title": "津波時の基本行動（72）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 22,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_073",
+      "title": "洪水時の基本行動（73）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 23,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_074",
+      "title": "土砂時の基本行動（74）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 24,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_stormSurge_075",
+      "title": "高潮時の基本行動（75）",
+      "disasterTypes": [
+        "stormSurge"
+      ],
+      "tags": [
+        "高潮",
+        "台風",
+        "basic"
+      ],
+      "priority": 25,
+      "steps": [
+        "低地を避ける",
+        "避難情報を確認",
+        "早めに高台へ",
+        "周囲の安全を確認する（高潮）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_fire_076",
+      "title": "火災時の基本行動（76）",
+      "disasterTypes": [
+        "fire"
+      ],
+      "tags": [
+        "火事",
+        "煙",
+        "basic"
+      ],
+      "priority": 26,
+      "steps": [
+        "119番通報",
+        "煙の少ない方向へ",
+        "エレベーター禁止",
+        "周囲の安全を確認する（火災）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_volcano_077",
+      "title": "噴火時の基本行動（77）",
+      "disasterTypes": [
+        "volcano"
+      ],
+      "tags": [
+        "降灰",
+        "火山",
+        "basic"
+      ],
+      "priority": 27,
+      "steps": [
+        "屋内に避難",
+        "マスク着用",
+        "降灰区域を避ける",
+        "周囲の安全を確認する（噴火）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_earthquake_078",
+      "title": "地震時の基本行動（78）",
+      "disasterTypes": [
+        "earthquake"
+      ],
+      "tags": [
+        "揺れ",
+        "倒壊",
+        "basic"
+      ],
+      "priority": 28,
+      "steps": [
+        "身の安全を確保",
+        "火の元を確認",
+        "出口を確保",
+        "周囲の安全を確認する（地震）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_tsunami_079",
+      "title": "津波時の基本行動（79）",
+      "disasterTypes": [
+        "tsunami"
+      ],
+      "tags": [
+        "津波",
+        "海岸",
+        "basic"
+      ],
+      "priority": 29,
+      "steps": [
+        "直ちに高台へ",
+        "海岸から離れる",
+        "避難指示に従う",
+        "周囲の安全を確認する（津波）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_flood_080",
+      "title": "洪水時の基本行動（80）",
+      "disasterTypes": [
+        "flood"
+      ],
+      "tags": [
+        "浸水",
+        "河川",
+        "basic"
+      ],
+      "priority": 10,
+      "steps": [
+        "高い場所へ",
+        "河川から離れる",
+        "不要な外出を控える",
+        "周囲の安全を確認する（洪水）"
+      ],
+      "source": "内閣府 国民保護・防災 https://www.bousai.go.jp/kyoiku/kokuminhogo/",
+      "sourceUpdated": "2020-01-01"
+    },
+    {
+      "id": "guide_landslide_081",
+      "title": "土砂時の基本行動（81）",
+      "disasterTypes": [
+        "landslide"
+      ],
+      "tags": [
+        "斜面",
+        "崖",
+        "basic"
+      ],
+      "priority": 11,
+      "steps": [
+        "危険区域から離れる",
+        "警戒区域を確認",
+        "避難準備",
+        "周囲の安全を確認する（土砂）"
+      ],
+      "source": "気象庁 防災情報 https://www.jma.go.jp/jma/kishou/know/bosai/index.html",
+      "sourceUpdated": "2020-01-01"
+    }
+  ]
+}

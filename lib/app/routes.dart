@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 
 import '../domain/entities/enums.dart';
+import '../ui/guide/guide_degrade_screen.dart';
+import '../ui/guide/guide_detail_screen.dart';
 import '../ui/home/home_screen.dart';
+import '../domain/entities/guide_card.dart';
 
 /// アプリ全体のルート定数。
 ///
@@ -27,9 +30,15 @@ Route<Object?>? onGenerateAppRoute(RouteSettings settings) {
       return MaterialPageRoute(
         settings: settings,
         builder: (context) => HomeScreen(
-          onSelect: (type) => Navigator.of(
-            context,
-          ).pushNamed(AppRoutes.result, arguments: type),
+          onSelect: (type) {
+            if (type == DisasterType.unknown) {
+              Navigator.of(context).pushNamed(AppRoutes.guide);
+            } else {
+              Navigator.of(
+                context,
+              ).pushNamed(AppRoutes.result, arguments: type);
+            }
+          },
         ),
       );
     case AppRoutes.result:
@@ -47,9 +56,12 @@ Route<Object?>? onGenerateAppRoute(RouteSettings settings) {
         builder: (_) => const _PlaceholderScreen(routeName: '経路案内 (S-03)'),
       );
     case AppRoutes.guide:
+      final card = settings.arguments as GuideCard?;
       return MaterialPageRoute(
         settings: settings,
-        builder: (_) => const _PlaceholderScreen(routeName: 'ガイド詳細 (S-04)'),
+        builder: (_) => card != null
+            ? GuideDetailScreen(card: card)
+            : const GuideDegradeScreen(),
       );
     case AppRoutes.settings:
       return MaterialPageRoute(
