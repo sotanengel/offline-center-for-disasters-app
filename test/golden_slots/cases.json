@@ -1,0 +1,502 @@
+[
+  {
+    "input": "津波が来る 避難したい",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "つなみ 逃げたい",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "大津波 どこへ",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "地震で揺れてる",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "余震が続く",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "洪水で浸水",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "豪雨 冠水",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "内水 氾濫",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "土砂崩れ",
+    "disasterType": "landslide",
+    "intent": "unknown"
+  },
+  {
+    "input": "がけ崩れ 警戒",
+    "disasterType": "landslide",
+    "intent": "unknown"
+  },
+  {
+    "input": "高潮 台風",
+    "disasterType": "stormSurge",
+    "intent": "unknown"
+  },
+  {
+    "input": "火事 煙",
+    "disasterType": "fire",
+    "intent": "unknown"
+  },
+  {
+    "input": "火災 避難",
+    "disasterType": "fire",
+    "intent": "route"
+  },
+  {
+    "input": "火山 噴火",
+    "disasterType": "volcano",
+    "intent": "unknown"
+  },
+  {
+    "input": "降灰 避難",
+    "disasterType": "volcano",
+    "intent": "route"
+  },
+  {
+    "input": "避難所 行き方",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "どうすればいい",
+    "disasterType": "unknown",
+    "intent": "both"
+  },
+  {
+    "input": "助けて",
+    "disasterType": "unknown",
+    "intent": "both"
+  },
+  {
+    "input": "車椅子 避難",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "ベビーカー 洪水",
+    "disasterType": "flood",
+    "intent": "route"
+  },
+  {
+    "input": "今すぐ 逃げ",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "教えて 地震",
+    "disasterType": "earthquake",
+    "intent": "guide"
+  },
+  {
+    "input": "安全 確認 津波",
+    "disasterType": "tsunami",
+    "intent": "guide"
+  },
+  {
+    "input": "津波が来る 避難したい 1",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "つなみ 逃げたい 1",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "大津波 どこへ 1",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "地震で揺れてる 1",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "余震が続く 1",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "洪水で浸水 1",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "豪雨 冠水 1",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "内水 氾濫 1",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "土砂崩れ 1",
+    "disasterType": "landslide",
+    "intent": "unknown"
+  },
+  {
+    "input": "がけ崩れ 警戒 1",
+    "disasterType": "landslide",
+    "intent": "unknown"
+  },
+  {
+    "input": "高潮 台風 1",
+    "disasterType": "stormSurge",
+    "intent": "unknown"
+  },
+  {
+    "input": "火事 煙 1",
+    "disasterType": "fire",
+    "intent": "unknown"
+  },
+  {
+    "input": "火災 避難 1",
+    "disasterType": "fire",
+    "intent": "route"
+  },
+  {
+    "input": "火山 噴火 1",
+    "disasterType": "volcano",
+    "intent": "unknown"
+  },
+  {
+    "input": "降灰 避難 1",
+    "disasterType": "volcano",
+    "intent": "route"
+  },
+  {
+    "input": "避難所 行き方 1",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "どうすればいい 1",
+    "disasterType": "unknown",
+    "intent": "both"
+  },
+  {
+    "input": "助けて 1",
+    "disasterType": "unknown",
+    "intent": "both"
+  },
+  {
+    "input": "車椅子 避難 1",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "ベビーカー 洪水 1",
+    "disasterType": "flood",
+    "intent": "route"
+  },
+  {
+    "input": "今すぐ 逃げ 1",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "教えて 地震 1",
+    "disasterType": "earthquake",
+    "intent": "guide"
+  },
+  {
+    "input": "安全 確認 津波 1",
+    "disasterType": "tsunami",
+    "intent": "guide"
+  },
+  {
+    "input": "津波が来る 避難したい 2",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "つなみ 逃げたい 2",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "大津波 どこへ 2",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "地震で揺れてる 2",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "余震が続く 2",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "洪水で浸水 2",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "豪雨 冠水 2",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "内水 氾濫 2",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "土砂崩れ 2",
+    "disasterType": "landslide",
+    "intent": "unknown"
+  },
+  {
+    "input": "がけ崩れ 警戒 2",
+    "disasterType": "landslide",
+    "intent": "unknown"
+  },
+  {
+    "input": "高潮 台風 2",
+    "disasterType": "stormSurge",
+    "intent": "unknown"
+  },
+  {
+    "input": "火事 煙 2",
+    "disasterType": "fire",
+    "intent": "unknown"
+  },
+  {
+    "input": "火災 避難 2",
+    "disasterType": "fire",
+    "intent": "route"
+  },
+  {
+    "input": "火山 噴火 2",
+    "disasterType": "volcano",
+    "intent": "unknown"
+  },
+  {
+    "input": "降灰 避難 2",
+    "disasterType": "volcano",
+    "intent": "route"
+  },
+  {
+    "input": "避難所 行き方 2",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "どうすればいい 2",
+    "disasterType": "unknown",
+    "intent": "both"
+  },
+  {
+    "input": "助けて 2",
+    "disasterType": "unknown",
+    "intent": "both"
+  },
+  {
+    "input": "車椅子 避難 2",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "ベビーカー 洪水 2",
+    "disasterType": "flood",
+    "intent": "route"
+  },
+  {
+    "input": "今すぐ 逃げ 2",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "教えて 地震 2",
+    "disasterType": "earthquake",
+    "intent": "guide"
+  },
+  {
+    "input": "安全 確認 津波 2",
+    "disasterType": "tsunami",
+    "intent": "guide"
+  },
+  {
+    "input": "津波が来る 避難したい 3",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "つなみ 逃げたい 3",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "大津波 どこへ 3",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "地震で揺れてる 3",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "余震が続く 3",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "洪水で浸水 3",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "豪雨 冠水 3",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "内水 氾濫 3",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "土砂崩れ 3",
+    "disasterType": "landslide",
+    "intent": "unknown"
+  },
+  {
+    "input": "がけ崩れ 警戒 3",
+    "disasterType": "landslide",
+    "intent": "unknown"
+  },
+  {
+    "input": "高潮 台風 3",
+    "disasterType": "stormSurge",
+    "intent": "unknown"
+  },
+  {
+    "input": "火事 煙 3",
+    "disasterType": "fire",
+    "intent": "unknown"
+  },
+  {
+    "input": "火災 避難 3",
+    "disasterType": "fire",
+    "intent": "route"
+  },
+  {
+    "input": "火山 噴火 3",
+    "disasterType": "volcano",
+    "intent": "unknown"
+  },
+  {
+    "input": "降灰 避難 3",
+    "disasterType": "volcano",
+    "intent": "route"
+  },
+  {
+    "input": "避難所 行き方 3",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "どうすればいい 3",
+    "disasterType": "unknown",
+    "intent": "both"
+  },
+  {
+    "input": "助けて 3",
+    "disasterType": "unknown",
+    "intent": "both"
+  },
+  {
+    "input": "車椅子 避難 3",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "ベビーカー 洪水 3",
+    "disasterType": "flood",
+    "intent": "route"
+  },
+  {
+    "input": "今すぐ 逃げ 3",
+    "disasterType": "unknown",
+    "intent": "route"
+  },
+  {
+    "input": "教えて 地震 3",
+    "disasterType": "earthquake",
+    "intent": "guide"
+  },
+  {
+    "input": "安全 確認 津波 3",
+    "disasterType": "tsunami",
+    "intent": "guide"
+  },
+  {
+    "input": "津波が来る 避難したい 4",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "つなみ 逃げたい 4",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "大津波 どこへ 4",
+    "disasterType": "tsunami",
+    "intent": "route"
+  },
+  {
+    "input": "地震で揺れてる 4",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "余震が続く 4",
+    "disasterType": "earthquake",
+    "intent": "unknown"
+  },
+  {
+    "input": "洪水で浸水 4",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "豪雨 冠水 4",
+    "disasterType": "flood",
+    "intent": "unknown"
+  },
+  {
+    "input": "内水 氾濫 4",
+    "disasterType": "flood",
+    "intent": "unknown"
+  }
+]
