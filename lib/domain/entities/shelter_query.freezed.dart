@@ -211,7 +211,7 @@ return $default(_that.disasterType,_that.minElevationM,_that.radiusKm);case _:
 
 class _ShelterQuery extends ShelterQuery {
   const _ShelterQuery({required this.disasterType, this.minElevationM = 0, this.radiusKm = 3.0}): super._();
-
+  
 
 @override final  DisasterType disasterType;
 /// 津波: 想定浸水深 + 5m（§4.2 required_elevation_m）
