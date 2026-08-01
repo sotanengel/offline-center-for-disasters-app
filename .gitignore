@@ -50,8 +50,8 @@ tools/out/
 tools/.venv/
 __pycache__/
 
-# シミュレータキャプチャ
-screenshots/
+# ビルド前に tool/build/prepare_bundled_packs.sh が生成（リポジトリ非コミット）
+assets/packs/**/pack.sqlite
 
 # 個人開発用の署名設定（DEVELOPMENT_TEAM 等）。各自ローカルで作成する。
 ios/Flutter/Personal.xcconfig
