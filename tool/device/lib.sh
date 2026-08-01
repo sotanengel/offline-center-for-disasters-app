@@ -90,28 +90,39 @@ device_log_indicates_launch_stall() {
 # 最後のアプリが消えるとプロファイルごと端末から外れ、次回は必ず「未信頼」に戻って
 # 手動タップが要る。テスト直後に入れ直しておけば信頼が保たれる。
 #
-# 後始末なので、失敗しても呼び出し元の終了コードは変えない（常に 0）。
+# アプリが消えていれば入れ直し、そのうえで開発者信頼を検証する。
+#
+# 「アプリが入っている」ことと「信頼されている」ことは別物: 別証明書で
+# 再署名されたアプリが入っているだけでも device_app_installed は true を
+# 返すため、インストール有無だけでは信頼を保証できない。呼び出し側が
+# 次のファイルへ進んでよいかを判断できるよう、必ず信頼を検証して結果を返す。
+#
+# 戻り値: 信頼済みなら DEVICE_EXIT_OK、そうでなければ DEVICE_EXIT_NOT_TRUSTED。
 device_restore_app() {
   local device="$1"
   local region="${2:-tokyo}"
   local script_dir="${3:-$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)}"
 
-  if device_app_installed "${device}"; then
-    device_log "restore skipped: app still installed"
-    return 0
+  if ! device_app_installed "${device}"; then
+    device_log "restore: reinstalling app to keep developer profile (信頼維持)"
+    local install_out
+    if ! install_out="$(flutter install -d "${device}" 2>&1)"; then
+      device_log "warn restore failed at flutter install:"
+      echo "${install_out}" | tail -20 >&2
+      return "${DEVICE_EXIT_NOT_TRUSTED}"
+    fi
+    if ! install_out="$("${script_dir}/install_pack.sh" "${region}" "${device}" 2>&1)"; then
+      device_log "warn restore failed at install_pack:"
+      echo "${install_out}" | tail -20 >&2
+      return "${DEVICE_EXIT_NOT_TRUSTED}"
+    fi
+    device_log "restore done region=${region}"
   fi
 
-  device_log "restore: reinstalling app to keep developer profile (信頼維持)"
-  if ! flutter install -d "${device}" >/dev/null 2>&1; then
-    device_log "warn restore failed at flutter install"
-    return 0
+  if device_assert_developer_trusted "${device}"; then
+    return "${DEVICE_EXIT_OK}"
   fi
-  if ! "${script_dir}/install_pack.sh" "${region}" "${device}" >/dev/null 2>&1; then
-    device_log "warn restore failed at install_pack"
-    return 0
-  fi
-  device_log "restore done region=${region}"
-  return 0
+  return "${DEVICE_EXIT_NOT_TRUSTED}"
 }
 
 # osascript（Xcode 自動操作）がエラー終了したログか。

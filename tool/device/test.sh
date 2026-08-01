@@ -63,85 +63,83 @@ if ! "${SCRIPT_DIR}/ensure_developer_trust.sh" "${DEVICE}"; then
 fi
 
 sim_log_info "device-test" "phase=integration"
-# flutter test はこの後アプリをアンインストールする。放置すると開発者プロファイルごと
-# 消えて次回が必ず未信頼になるため、どの経路で抜けても必ず入れ直す。
-trap 'device_restore_app "${DEVICE}" "${REGION}" "${SCRIPT_DIR}"' EXIT
-flutter_log="$(mktemp /tmp/ocd-device-integration.XXXXXX)"
-flutter_exit=0
-# flutter test は自身でアプリを再インストールするため、上の信頼チェック後に
-# 再び「未信頼のデベロッパ」状態へ戻ることがある。その場合アプリが起動できず
-# 無期限にハングするので、必ず壁時計で打ち切る。
-# 壁時計の 10 分を待たずに、起動停滞を見つけ次第すぐ打ち切る監視。
-stall_marker="$(mktemp "${TMPDIR:-/tmp}/ocd-stall.XXXXXX")"
-rm -f "${stall_marker}"
-(
-  while true; do
-    sleep 5
-    if device_log_indicates_launch_stall "${flutter_log}"; then
-      : >"${stall_marker}"
-      pkill -f "flutter_tools.snapshot test" 2>/dev/null || true
-      exit 0
-    fi
-  done
-) &
-stall_watch_pid=$!
+# flutter test は「ディレクトリ一括」で渡すと、含まれるテストファイルごとに
+# アプリを再インストールする。1 回でも失敗・中断すればそこで信頼が壊れ、
+# 以降のファイルは巻き添えで全部失敗する（2026-08-02 実機検証で実際に発生）。
+# ファイルごとに実行し、そのつど信頼を検証してから次へ進む。
+overall_exit="${SIM_EXIT_OK}"
+# shellcheck disable=SC2207 # 対象は ASCII のファイル名のみ
+integration_files=($(grep -L "real_llm" "${ROOT}"/integration_test/*.dart))
 
-device_run_with_timeout "${DEVICE_INTEGRATION_TIMEOUT_SEC}" \
-  "flutter test integration_test -d '${DEVICE}' --exclude-tags real_llm --timeout 180s 2>&1 | tee '${flutter_log}'" \
-  || flutter_exit=$?
+for test_file in "${integration_files[@]}"; do
+  rel_file="${test_file#"${ROOT}"/}"
+  sim_log_info "device-test" "phase=integration file=${rel_file}"
 
-kill "${stall_watch_pid}" 2>/dev/null || true
-wait "${stall_watch_pid}" 2>/dev/null || true
-
-if [[ -e "${stall_marker}" ]]; then
+  flutter_log="$(mktemp /tmp/ocd-device-integration.XXXXXX)"
+  flutter_exit=0
+  stall_marker="$(mktemp "${TMPDIR:-/tmp}/ocd-stall.XXXXXX")"
   rm -f "${stall_marker}"
-  sim_log_error "device-test" "アプリの起動に失敗したため中断しました"
-  # 症状（起動できない）は同じでも原因は複数ありうるため、決め打ちせず順に確かめる。
-  # いずれも確定診断ではなく手がかりとして案内する。
-  if ! "${SCRIPT_DIR}/ensure_developer_trust.sh" "${DEVICE}"; then
-    sim_log_error "device-test" "開発者信頼が解除されています。"
-    device_print_trust_guide
-  elif device_log_indicates_automation_permission_denied "${flutter_log}"; then
-    sim_log_error "device-test" \
-      "開発者信頼は有効。osascript がエラー終了しています。" \
-      "Mac 側の 設定 → プライバシーとセキュリティ → オートメーション で" \
-      "Xcode の自動操作が許可されているか確認してください（未許可が原因の可能性）。"
-    tail -40 "${flutter_log}" >&2 || true
-  else
-    sim_log_error "device-test" "原因不明。flutter log tail を確認してください:"
-    tail -40 "${flutter_log}" >&2 || true
-  fi
-  rm -f "${flutter_log}"
-  exit "${DEVICE_EXIT_NOT_TRUSTED}"
-fi
-rm -f "${stall_marker}"
+  (
+    while true; do
+      sleep 5
+      if device_log_indicates_launch_stall "${flutter_log}"; then
+        : >"${stall_marker}"
+        pkill -f "flutter_tools.snapshot test" 2>/dev/null || true
+        exit 0
+      fi
+    done
+  ) &
+  stall_watch_pid=$!
 
-if [[ "${flutter_exit}" -eq "${DEVICE_EXIT_TIMEOUT}" ]]; then
-  sim_log_error "device-test" \
-    "integration timed out after ${DEVICE_INTEGRATION_TIMEOUT_SEC}s (ハングではなく失敗として打ち切り)"
-  # 最有力原因は再インストールによる開発者信頼の解除。実際に確かめて案内する。
-  if ! "${SCRIPT_DIR}/ensure_developer_trust.sh" "${DEVICE}"; then
-    sim_log_error "device-test" "原因: 再インストールで開発者信頼が解除されています。上の手順で信頼してから再実行してください。"
+  device_run_with_timeout "${DEVICE_INTEGRATION_TIMEOUT_SEC}" \
+    "flutter test '${rel_file}' -d '${DEVICE}' --timeout 180s 2>&1 | tee '${flutter_log}'" \
+    || flutter_exit=$?
+
+  kill "${stall_watch_pid}" 2>/dev/null || true
+  wait "${stall_watch_pid}" 2>/dev/null || true
+
+  file_failed=false
+  if [[ -e "${stall_marker}" ]]; then
+    rm -f "${stall_marker}"
+    sim_log_error "device-test" "file=${rel_file} アプリの起動に失敗したため中断しました"
+    file_failed=true
+  elif [[ "${flutter_exit}" -eq "${DEVICE_EXIT_TIMEOUT}" ]]; then
+    sim_log_error "device-test" \
+      "file=${rel_file} timed out after ${DEVICE_INTEGRATION_TIMEOUT_SEC}s (ハングではなく失敗として打ち切り)"
+    file_failed=true
+  else
+    category="$(sim_classify_flutter_log "${flutter_log}")"
+    sim_log_info "device-test" "file=${rel_file} category=${category} flutter_exit=${flutter_exit}"
+    if [[ "${category}" != "SUCCESS" ]]; then
+      sim_print_failure_guide "${category}"
+      overall_exit="$(sim_category_exit_code "${category}")"
+    fi
+  fi
+  rm -f "${stall_marker}"
+
+  # このファイルの結果に関わらず、次のファイルへ進む前に必ず入れ直して
+  # 信頼を検証する。信頼が壊れていれば直ちに中断し、以降のファイルを
+  # 巻き添えで失敗させない。
+  if ! device_restore_app "${DEVICE}" "${REGION}" "${SCRIPT_DIR}"; then
+    sim_log_error "device-test" \
+      "file=${rel_file} の後で開発者信頼が失われました。以降のファイルは実行しません。"
+    device_print_trust_guide
+    tail -40 "${flutter_log}" >&2 || true
     rm -f "${flutter_log}"
     exit "${DEVICE_EXIT_NOT_TRUSTED}"
   fi
-  sim_log_error "device-test" "開発者信頼は有効。テスト側のハングとして flutter log tail を確認してください:"
-  tail -40 "${flutter_log}" >&2 || true
-  rm -f "${flutter_log}"
-  exit "${DEVICE_EXIT_TIMEOUT}"
-fi
 
-category="$(sim_classify_flutter_log "${flutter_log}")"
-sim_log_info "device-test" "phase=integration category=${category} flutter_exit=${flutter_exit}"
-
-if [[ "${category}" == "SUCCESS" ]]; then
+  if [[ "${file_failed}" == "true" ]]; then
+    sim_log_error "device-test" "file=${rel_file} flutter log tail:"
+    tail -40 "${flutter_log}" >&2 || true
+    if [[ "${overall_exit}" -eq "${SIM_EXIT_OK}" ]]; then
+      overall_exit="${DEVICE_EXIT_TIMEOUT}"
+    fi
+  fi
   rm -f "${flutter_log}"
+done
+
+if [[ "${overall_exit}" -eq "${SIM_EXIT_OK}" ]]; then
   sim_log_info "device-test" "all phases passed"
-  exit "${SIM_EXIT_OK}"
 fi
-
-sim_print_failure_guide "${category}"
-sim_log_error "device-test" "flutter log tail:"
-tail -40 "${flutter_log}" >&2 || true
-rm -f "${flutter_log}"
-exit "$(sim_category_exit_code "${category}")"
+exit "${overall_exit}"
