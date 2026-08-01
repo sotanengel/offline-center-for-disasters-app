@@ -70,9 +70,14 @@ prs:
     pr: 21
   - id: PR-14
     title: LEAP SDK 統合・シミュレータ安定化・実避難先表示・座標統一
+    status: done
+    pr: 22
+    features_covered: [F-02, F-03, F-04]
+  - id: PR-15
+    title: LFM2.5 実推論 integration/unit テスト（real_llm タグ）
     status: in_progress
     pr: null
-    features_covered: [F-02, F-03, F-04]
+    features_covered: [F-02]
 
 # 要件定義書 §19 の実装フェーズ
 phases:
@@ -106,19 +111,19 @@ phases:
     title: LEAP SDK 統合・ティア判定・モデルDL・AI-1/AI-2
     spec_ref: "§19"
     status: done
-    pr: null
+    pr: 22
     notes: "liquid_ai 採用。LeapLlmEngine + CompositeSituationAnalyzer"
   - id: P6
     title: AI-3 リランキング・AI-4 生成 + ハルシネーションガード
     spec_ref: "§19"
     status: done
-    pr: null
+    pr: 22
     notes: "GuideReranker + PhraseGenerator + HallucinationGuard"
   - id: P7
     title: アクセシビリティ・省電力・実機性能チューニング
     spec_ref: "§19"
     status: done
-    pr: null
+    pr: 22
     notes: "PR-11 でアクセシビリティ smoke・オフライン CI を追加"
 
 # 要件定義書 §10 の機能要件
