@@ -7,8 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
-  testWidgets('アプリが起動しホーム画面（S-01）が表示される', (tester) async {
-    SharedPreferences.setMockInitialValues({});
+  testWidgets('オンボーディング完了済みならホーム画面（S-01）が表示される', (tester) async {
+    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
     final prefs = await SharedPreferences.getInstance();
     await tester.pumpWidget(
       ProviderScope(
@@ -16,7 +16,7 @@ void main() {
         child: const OfflineCenterApp(),
       ),
     );
-    await tester.pump();
+    await tester.pumpAndSettle();
     expect(find.text('どの災害から逃げますか？'), findsOneWidget);
   });
 }

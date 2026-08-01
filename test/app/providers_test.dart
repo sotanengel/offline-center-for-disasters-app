@@ -10,9 +10,7 @@ void main() {
   test('dataPackProvider: パックファイル不在時は null を返し例外を投げない', () async {
     final container = ProviderContainer(
       overrides: [
-        packPathProvider.overrideWith(
-          (ref) async => '/nonexistent/path/to/pack.sqlite',
-        ),
+        installedPackInfosProvider.overrideWith((ref) async => const []),
       ],
     );
     addTearDown(container.dispose);
@@ -65,7 +63,7 @@ void main() {
     expect(await container.read(shelterFinderProvider.future), isNull);
   });
 
-  test('DataPack 型がインポート可能 (コンパイル時保証)', () {
+  test('EvacuationPack / DataPack 型がインポート可能 (コンパイル時保証)', () {
     expect(DataPack, isNotNull);
   });
 }
