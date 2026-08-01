@@ -86,6 +86,19 @@ jobs:
         working-directory: tools
         run: uv run pytest
 
+  offline-imports:
+    name: Offline static check (lib/ no network imports)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+        with:
+          persist-credentials: false
+
+      - name: Check lib/ imports
+        run: bash tool/check_offline_imports.sh
+
   zizmor:
     name: Workflow security audit (zizmor)
     runs-on: ubuntu-latest
