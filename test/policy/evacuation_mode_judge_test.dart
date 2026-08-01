@@ -103,4 +103,25 @@ void main() {
       expect(mode, EvacuationMode.stayOrHorizontal);
     });
   });
+
+  group('猶予時間の扱い (§17 Q9 未決)', () {
+    // Q9: 災害種別ごとの猶予時間の根拠が未決のため、graceTime=null では
+    // travelExceeded=false として扱う (§4.3 の判定を creativeに埋めない)。
+    test('graceTime=null かつ通常移動可 + 水位 none なら水平避難', () {
+      const ctx = HazardContext(
+        inFloodZone: true,
+        floodDepthM: 2.0,
+        // graceTime は指定せず null (既定)
+      );
+      final mode = judge.judge(
+        type: DisasterType.flood,
+        ctx: ctx,
+        env: const Environment(place: PlaceType.indoor, floor: 3),
+        estimatedTravelTime: const Duration(hours: 999),
+      );
+      // travelExceeded は null 猶予時間により常に false、
+      // mobility=normal & waterLevel=none で他の垂直条件も満たさない → 水平
+      expect(mode, EvacuationMode.horizontal);
+    });
+  });
 }

@@ -14,16 +14,22 @@ class ShelterSearchResult {
   const ShelterSearchResult({
     required this.shelters,
     required this.radiusKmUsed,
+    required this.notFound,
+    required this.expandedRadius,
   });
 
   /// 直線距離昇順・最大 20 件（§9.1 手順4）。0 件なら空。
   final List<Shelter> shelters;
 
-  /// 実際に使った半径 [km]（§4.4: 3 → 10 に拡大したかの記録用）
+  /// 実際に使った半径 [km]（§4.4: 3 → 10 に拡大したかの記録用）。
   final double radiusKmUsed;
 
-  /// §4.4: 初期半径で 0 件となり 10km へ拡大したか。
-  bool get expandedRadius => radiusKmUsed > 3.0;
+  /// 拡大半径でも 0 件だったこと。true のときは避難先を断定表示しない（§4.4）。
+  final bool notFound;
+
+  /// §4.4: 初期半径で 0 件となり 10km へ拡大し、拡大側で見つかったか。
+  /// [notFound] が true のときは常に false。
+  final bool expandedRadius;
 }
 
 /// §9.1 手順2〜4: R*Tree 半径検索 → 属性フィルタ（§4.1）→ 距離順 20 件。
@@ -41,7 +47,9 @@ class ShelterFinder {
     required GeoPoint origin,
     required ShelterQuery query,
   }) async {
+    var attempt = 0;
     for (final radiusKm in [query.radiusKm, _expandedRadiusKm]) {
+      attempt++;
       final candidates = await _bboxQuery(origin, radiusKm);
       final matched = <(Shelter, double)>[];
       for (final shelter in candidates) {
@@ -64,6 +72,9 @@ class ShelterFinder {
         return ShelterSearchResult(
           shelters: matched.take(_maxCandidates).map((e) => e.$1).toList(),
           radiusKmUsed: radiusKm,
+          notFound: false,
+          // 拡大 (2 回目) で見つかったときのみ true。
+          expandedRadius: attempt > 1,
         );
       }
       if (radiusKm >= _expandedRadiusKm) break;
@@ -71,6 +82,8 @@ class ShelterFinder {
     return const ShelterSearchResult(
       shelters: [],
       radiusKmUsed: _expandedRadiusKm,
+      notFound: true,
+      expandedRadius: false,
     );
   }
 

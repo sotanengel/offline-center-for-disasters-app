@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 
 import '../../core/geo/geo_point.dart';
 import '../../domain/entities/route_result.dart';
+import '../../domain/entities/route_search_result.dart';
 import '../../domain/entities/routing_profile.dart';
 import '../../domain/entities/shelter.dart';
 import '../../domain/services/route_engine.dart';
@@ -23,7 +24,7 @@ class GraphRouteEngine implements RouteEngine {
   final List<GraphEdge> _edges;
 
   @override
-  Future<Map<String, RouteResult>> findRoutesToMany({
+  Future<RouteSearchResult> findRoutesToMany({
     required GeoPoint origin,
     required List<Shelter> candidates,
     required RoutingProfile profile,
@@ -31,14 +32,14 @@ class GraphRouteEngine implements RouteEngine {
   }) async {
     final graph = RoadGraph(nodes: _nodes, edges: _edges);
     final start = graph.nearestNode(origin);
-    if (start == null) return const {};
+    if (start == null) return const RouteSearchResult();
 
     // nearest_node_id 未スナップの候補は経路探索不能のため除外する
     final targets = <String, int>{
       for (final s in candidates)
         if (s.nearestNodeId != null) s.id: s.nearestNodeId!,
     };
-    if (targets.isEmpty) return const {};
+    if (targets.isEmpty) return const RouteSearchResult();
 
     final result = await compute(
       _runInIsolate,
@@ -66,7 +67,7 @@ class GraphRouteEngine implements RouteEngine {
         instructions: TurnByTurnBuilder().build(legs),
       );
     }
-    return out;
+    return RouteSearchResult(routes: out, timedOut: result.timedOut);
   }
 
   List<PathLeg> _buildLegs(

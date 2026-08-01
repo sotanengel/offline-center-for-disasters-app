@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:drift/drift.dart';
 
+import '../../core/geo/geo_bounds.dart';
 import '../../core/geo/geo_point.dart';
 import '../../core/geo/polyline_codec.dart';
 import '../routing/graph_edge.dart';
@@ -13,27 +14,77 @@ class GraphLoader {
 
   final DatabaseConnectionUser _db;
 
-  Future<RoadGraph> load() async {
-    final nodeRows = await _db
-        .customSelect('SELECT id, lat, lng FROM nodes')
-        .get();
-    final nodes = <int, GeoPoint>{
-      for (final r in nodeRows)
-        (r.data['id'] as num).toInt(): GeoPoint(
-          (r.data['lat'] as num).toDouble(),
-          (r.data['lng'] as num).toDouble(),
-        ),
-    };
+  /// [bounds] を渡すと、その bbox 内のノードとその両端を含むエッジのみをロードする
+  /// （§16.1 メモリ・§16.3 検索時間の対策）。省略時は全件ロード（既存互換）。
+  Future<RoadGraph> load({GeoBounds? bounds}) async {
+    final Map<int, GeoPoint> nodes;
+    final List<GraphEdge> edges;
 
-    final edgeRows = await _db
-        .customSelect(
-          'SELECT id, from_node, to_node, length_m, geometry, way_type,'
-          ' width_class, has_steps, is_lit, hz_flood_depth, hz_tsunami_depth,'
-          ' hz_landslide, hz_storm_surge, hz_volcano, near_river, dense_wood,'
-          ' landmark_name FROM edges',
-        )
-        .get();
-    final edges = [for (final row in edgeRows) _rowToEdge(row.data)];
+    if (bounds == null) {
+      final nodeRows = await _db
+          .customSelect('SELECT id, lat, lng FROM nodes')
+          .get();
+      nodes = <int, GeoPoint>{
+        for (final r in nodeRows)
+          (r.data['id'] as num).toInt(): GeoPoint(
+            (r.data['lat'] as num).toDouble(),
+            (r.data['lng'] as num).toDouble(),
+          ),
+      };
+
+      final edgeRows = await _db
+          .customSelect(
+            'SELECT id, from_node, to_node, length_m, geometry, way_type,'
+            ' width_class, has_steps, is_lit, hz_flood_depth, hz_tsunami_depth,'
+            ' hz_landslide, hz_storm_surge, hz_volcano, near_river, dense_wood,'
+            ' landmark_name FROM edges',
+          )
+          .get();
+      edges = [for (final row in edgeRows) _rowToEdge(row.data)];
+    } else {
+      final nodeRows = await _db
+          .customSelect(
+            'SELECT id, lat, lng FROM nodes'
+            ' WHERE lat BETWEEN ? AND ? AND lng BETWEEN ? AND ?',
+            variables: [
+              Variable.withReal(bounds.minLat),
+              Variable.withReal(bounds.maxLat),
+              Variable.withReal(bounds.minLng),
+              Variable.withReal(bounds.maxLng),
+            ],
+          )
+          .get();
+      nodes = <int, GeoPoint>{
+        for (final r in nodeRows)
+          (r.data['id'] as num).toInt(): GeoPoint(
+            (r.data['lat'] as num).toDouble(),
+            (r.data['lng'] as num).toDouble(),
+          ),
+      };
+      if (nodes.isEmpty) {
+        return RoadGraph(nodes: const {}, edges: const []);
+      }
+      // 両端ノードが bbox 内にあるエッジのみを取得する
+      // (IN 句をノード ID 列にバインド)
+      final ids = nodes.keys.toList();
+      final placeholders = List.filled(ids.length, '?').join(',');
+      final edgeRows = await _db
+          .customSelect(
+            'SELECT id, from_node, to_node, length_m, geometry, way_type,'
+            ' width_class, has_steps, is_lit, hz_flood_depth, hz_tsunami_depth,'
+            ' hz_landslide, hz_storm_surge, hz_volcano, near_river, dense_wood,'
+            ' landmark_name FROM edges'
+            ' WHERE from_node IN ($placeholders)'
+            ' AND to_node IN ($placeholders)',
+            variables: [
+              for (final id in ids) Variable.withInt(id),
+              for (final id in ids) Variable.withInt(id),
+            ],
+          )
+          .get();
+      edges = [for (final row in edgeRows) _rowToEdge(row.data)];
+    }
+
     return RoadGraph(nodes: nodes, edges: edges);
   }
 
