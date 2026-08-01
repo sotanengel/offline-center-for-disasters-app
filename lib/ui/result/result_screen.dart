@@ -7,6 +7,7 @@ import '../../core/geo/geo_point.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/entities/route_result.dart';
 import '../../domain/entities/situation_slots.dart';
+import '../../domain/usecases/destination_plan_progress.dart';
 import '../../domain/usecases/destination_planner.dart';
 import '../../ui/home/home_screen.dart';
 
@@ -21,7 +22,7 @@ class ResultScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final simpleMode = ref.watch(llmSimpleModeProvider).valueOrNull ?? false;
-    final planAsync = ref.watch(destinationPlanProvider(slots));
+    final planState = ref.watch(destinationPlanProvider(slots));
 
     return Scaffold(
       appBar: AppBar(
@@ -38,11 +39,18 @@ class ResultScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: planAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text('避難先の取得に失敗しました: $e')),
-        data: (plan) => _ResultBody(slots: slots, plan: plan),
-      ),
+      body: switch (planState) {
+        DestinationPlanLoading(:final progress) => _PlanLoadingBody(
+          progress: progress,
+        ),
+        DestinationPlanFailed(:final error) => Center(
+          child: Text('避難先の取得に失敗しました: $error'),
+        ),
+        DestinationPlanReady(:final plan) => _ResultBody(
+          slots: slots,
+          plan: plan,
+        ),
+      },
     );
   }
 
@@ -67,6 +75,29 @@ class ResultScreen extends ConsumerWidget {
                     );
                   },
                 ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _PlanLoadingBody extends StatelessWidget {
+  const _PlanLoadingBody({required this.progress});
+
+  final DestinationPlanProgress progress;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            LinearProgressIndicator(value: progress.fraction),
+            const SizedBox(height: 16),
+            Text(progress.label, textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -224,7 +255,7 @@ class _DestinationSummary extends StatelessWidget {
         child: ListTile(
           title: const Text('近くに適合する避難所が見つかりません'),
           subtitle: Text(
-            plan.expandedRadius ? '10km 圏内を探索しました（§4.4）' : '3km 圏内を探索しました',
+            plan.expandedRadius ? '20km 圏内を探索しました（§4.4）' : '10km 圏内を探索しました',
           ),
         ),
       );

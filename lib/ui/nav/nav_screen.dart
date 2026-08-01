@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import '../../app/providers.dart';
 import '../../core/geo/geo_bounds.dart';
 import '../../core/geo/geo_point.dart';
+import '../../core/geo/route_progress.dart';
 import '../../data/routing/road_graph.dart';
 import '../../domain/entities/route_result.dart';
 import '../../domain/usecases/destination_planner.dart';
@@ -37,10 +38,12 @@ class _NavScreenState extends ConsumerState<NavScreen> {
   final _mapController = MapController();
   RoadGraph? _roadGraph;
   var _cameraFitted = false;
+  GeoPoint? _currentPosition;
 
   @override
   void initState() {
     super.initState();
+    _currentPosition = widget.origin;
     _loadRoadGraph();
   }
 
@@ -87,23 +90,28 @@ class _NavScreenState extends ConsumerState<NavScreen> {
     if (route != null && route.polyline.length >= 2) {
       return route.polyline;
     }
-    return [widget.origin];
+    return [_currentPosition ?? widget.origin];
   }
+
+  GeoPoint get _displayPosition => _currentPosition ?? widget.origin;
 
   @override
   Widget build(BuildContext context) {
+    ref.listen<AsyncValue<GeoPoint?>>(positionStreamProvider, (_, next) {
+      next.whenData((point) {
+        if (point == null || !mounted) return;
+        setState(() => _currentPosition = point);
+      });
+    });
+
     final route = widget.route;
+    final position = _displayPosition;
     final dest = route?.polyline.isNotEmpty == true
         ? route!.polyline.last
         : widget.origin;
-    final bearing = _bearing(widget.origin, dest);
-    final distanceM = route?.distanceM ?? _haversineM(widget.origin, dest);
-
-    final instruction = widget.fallbackBearing || route == null
-        ? '直線方位: ${bearing.toStringAsFixed(0)}°'
-        : (route.instructions.isNotEmpty
-              ? route.instructions.first.text
-              : '直進');
+    final bearing = _bearing(position, dest);
+    final distanceM = _remainingDistanceM(route, position, dest);
+    final instruction = _instructionText(route, position, bearing);
 
     final roadPolylines = _roadGraph == null
         ? const <Polyline>[]
@@ -146,7 +154,7 @@ class _NavScreenState extends ConsumerState<NavScreen> {
             child: FlutterMap(
               mapController: _mapController,
               options: MapOptions(
-                initialCenter: LatLng(widget.origin.lat, widget.origin.lng),
+                initialCenter: LatLng(position.lat, position.lng),
                 initialZoom: 14,
                 backgroundColor: kNavMapBackgroundColor,
                 interactionOptions: const InteractionOptions(
@@ -172,7 +180,7 @@ class _NavScreenState extends ConsumerState<NavScreen> {
                 MarkerLayer(
                   markers: [
                     Marker(
-                      point: LatLng(widget.origin.lat, widget.origin.lng),
+                      point: LatLng(position.lat, position.lng),
                       width: 24,
                       height: 24,
                       child: const Icon(
@@ -198,6 +206,33 @@ class _NavScreenState extends ConsumerState<NavScreen> {
         ],
       ),
     );
+  }
+
+  double _remainingDistanceM(
+    RouteResult? route,
+    GeoPoint position,
+    GeoPoint dest,
+  ) {
+    if (route != null && route.polyline.length >= 2) {
+      return remainingDistanceM(position, route.polyline);
+    }
+    return _haversineM(position, dest);
+  }
+
+  String _instructionText(
+    RouteResult? route,
+    GeoPoint position,
+    double bearing,
+  ) {
+    if (widget.fallbackBearing || route == null) {
+      return '直線方位: ${bearing.toStringAsFixed(0)}°';
+    }
+    if (route.instructions.isNotEmpty && route.polyline.length >= 2) {
+      final traveled = traveledDistanceM(position, route.polyline);
+      final active = activeInstruction(route.instructions, traveled);
+      if (active != null) return active.text;
+    }
+    return route.instructions.isNotEmpty ? route.instructions.first.text : '直進';
   }
 
   double _bearing(GeoPoint from, GeoPoint to) {

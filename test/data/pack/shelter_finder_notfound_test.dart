@@ -53,7 +53,7 @@ void main() {
       db,
       rowid: 1,
       id: 'far',
-      lat: 35.05,
+      lat: 35.11,
       lng: 139.0,
       okVolcano: 1,
     );

@@ -221,7 +221,7 @@ return $default(_that.inFloodZone,_that.floodDepthM,_that.inTsunamiZone,_that.ts
 
 class _HazardContext implements HazardContext {
   const _HazardContext({this.inFloodZone = false, this.floodDepthM = 0, this.inTsunamiZone = false, this.tsunamiDepthM = 0, this.landslideClass = 0, this.inStormSurgeZone = false, this.stormSurgeM = 0, this.volcanoClass = 0, this.distCoastM, this.distRiverM, this.denseWood = false, this.currentElevationM, this.graceTime});
-
+  
 
 @override@JsonKey() final  bool inFloodZone;
 @override@JsonKey() final  double floodDepthM;

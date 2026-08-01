@@ -8,6 +8,9 @@ abstract interface class LocationService {
   Future<Position> getCurrentPosition({
     LocationSettings locationSettings = const LocationSettings(),
   });
+  Stream<Position> getPositionStream({
+    LocationSettings locationSettings = const LocationSettings(),
+  });
 }
 
 /// Geolocator への委譲実装。
@@ -29,4 +32,9 @@ class GeolocatorLocationService implements LocationService {
   Future<Position> getCurrentPosition({
     LocationSettings locationSettings = const LocationSettings(),
   }) => Geolocator.getCurrentPosition(locationSettings: locationSettings);
+
+  @override
+  Stream<Position> getPositionStream({
+    LocationSettings locationSettings = const LocationSettings(),
+  }) => Geolocator.getPositionStream(locationSettings: locationSettings);
 }

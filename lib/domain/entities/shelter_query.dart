@@ -16,8 +16,8 @@ abstract class ShelterQuery with _$ShelterQuery {
     /// 津波: 想定浸水深 + 5m（§4.2 required_elevation_m）
     @Default(0) double minElevationM,
 
-    /// 初期探索半径 [km]（§4.4: 0 件なら 10km に拡大）
-    @Default(3.0) double radiusKm,
+    /// 初期探索半径 [km]（§4.4 / Q10: 0 件なら 20km に拡大）
+    @Default(10.0) double radiusKm,
   }) = _ShelterQuery;
 
   const ShelterQuery._();

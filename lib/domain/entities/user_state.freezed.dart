@@ -211,7 +211,7 @@ return $default(_that.injured,_that.mobility,_that.groupSize,_that.hasInfant,_th
 
 class _UserState implements UserState {
   const _UserState({this.injured = false, this.mobility = Mobility.normal, this.groupSize = 1, this.hasInfant = false, this.hasPet = false});
-
+  
 
 @override@JsonKey() final  bool injured;
 @override@JsonKey() final  Mobility mobility;

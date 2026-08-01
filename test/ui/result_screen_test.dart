@@ -29,6 +29,28 @@ void main() {
     await tester.pumpAndSettle();
   }
 
+  testWidgets('探索中は LinearProgressIndicator と段階ラベルを表示する', (tester) async {
+    const slots = SituationSlots(
+      disasterType: DisasterType.earthquake,
+      source: SlotSource.tile,
+    );
+    SharedPreferences.setMockInitialValues({});
+    final prefs = await SharedPreferences.getInstance();
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          sharedPreferencesProvider.overrideWithValue(prefs),
+          llmEngineProvider.overrideWithValue(LeapStubEngine()),
+          destinationPlanLoadingOverride(),
+        ],
+        child: MaterialApp(home: ResultScreen(slots: slots)),
+      ),
+    );
+    await tester.pump();
+    expect(find.byType(LinearProgressIndicator), findsOneWidget);
+    expect(find.text('避難所を探索中...'), findsOneWidget);
+  });
+
   testWidgets('パック探索結果の避難所名を表示する', (tester) async {
     const slots = SituationSlots(
       disasterType: DisasterType.earthquake,

@@ -229,7 +229,7 @@ return $default(_that.speedMps,_that.hazardField,_that.hazardZonePenalty,_that.l
 
 class _RoutingProfile implements RoutingProfile {
   const _RoutingProfile({this.speedMps = 1.25, this.hazardField = HazardEdgeKind.none, this.hazardZonePenalty = 4.0, this.landslideSpecialForbidden = false, this.forbidUnderpass = false, this.underpassPenalty = 0, this.riverNearPenalty = 0, this.narrowPenalty = 0, this.forbidSteps = false, this.forbidNarrowWheelchair = false, this.isNight = false, this.nightPenalty = 0.3});
-
+  
 
 /// mobility = normal / slow / assisted / wheelchair → 1.25 / 0.8 / 0.6 / 0.7
 @override@JsonKey() final  double speedMps;

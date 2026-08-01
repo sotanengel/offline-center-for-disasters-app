@@ -8,6 +8,7 @@ import '../../domain/entities/situation_slots.dart';
 import '../../domain/policies/destination_policy.dart';
 import '../../data/pack/evacuation_pack.dart';
 import '../../domain/services/route_engine.dart';
+import 'destination_plan_progress.dart';
 
 /// S-02 避難先候補 + 経路のプレビュー（§9.1 / §4.4）。
 class DestinationPlan {
@@ -65,7 +66,11 @@ class DestinationPlanner {
     EvacuationPack? pack,
     RouteEngine? routeEngine,
     RouteEngineFactory? routeEngineFactory,
+    void Function(DestinationPlanProgress progress)? onProgress,
   }) async {
+    void report(DestinationPlanProgress progress) => onProgress?.call(progress);
+
+    report(DestinationPlanProgress.hazardContext);
     if (pack == null) {
       return DestinationPlan(origin: origin, packMissing: true);
     }
@@ -76,6 +81,7 @@ class DestinationPlanner {
       originCtx,
       slots.userState,
     );
+    report(DestinationPlanProgress.shelterSearch);
     final search = await pack.findShelters(origin: origin, query: query);
 
     if (search.notFound || search.shelters.isEmpty) {
@@ -96,6 +102,7 @@ class DestinationPlanner {
     // 実機では重すぎるため、現在地と避難先を覆う範囲だけに絞る。
     var engine = routeEngine;
     if (engine == null && routeEngineFactory != null) {
+      report(DestinationPlanProgress.graphLoad);
       final bounds = routeGraphBoundsFor(
         origin,
         GeoPoint(shelter.lat, shelter.lng),
@@ -106,6 +113,7 @@ class DestinationPlanner {
     RouteResult? route;
     var timedOut = false;
     if (engine != null && shelter.nearestNodeId != null) {
+      report(DestinationPlanProgress.routeCalc);
       final profile = _policy.buildRoutingProfile(
         slots.disasterType,
         slots.userState,
@@ -120,6 +128,7 @@ class DestinationPlanner {
       route = routes.routes[shelter.id];
     }
 
+    report(DestinationPlanProgress.complete);
     return DestinationPlan(
       origin: origin,
       shelter: shelter,

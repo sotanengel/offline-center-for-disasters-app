@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:geolocator/geolocator.dart';
 import 'package:offline_center_for_disasters/data/location/location_service.dart';
 
@@ -8,7 +10,7 @@ class FakeLocationService implements LocationService {
     this.permission = LocationPermission.denied,
     this.permissionAfterRequest = LocationPermission.whileInUse,
     this.position = const GeoPointPosition(35.687741, 139.850977),
-  });
+  }) : _positionController = StreamController<GeoPointPosition>.broadcast();
 
   bool serviceEnabled;
   LocationPermission permission;
@@ -16,6 +18,12 @@ class FakeLocationService implements LocationService {
   GeoPointPosition position;
   int requestPermissionCalls = 0;
   int checkPermissionCalls = 0;
+  final StreamController<GeoPointPosition> _positionController;
+
+  void emitPosition(GeoPointPosition next) {
+    position = next;
+    _positionController.add(next);
+  }
 
   @override
   Future<bool> isLocationServiceEnabled() async => serviceEnabled;
@@ -37,9 +45,20 @@ class FakeLocationService implements LocationService {
   Future<Position> getCurrentPosition({
     LocationSettings locationSettings = const LocationSettings(),
   }) async {
+    return _toPosition(position);
+  }
+
+  @override
+  Stream<Position> getPositionStream({
+    LocationSettings locationSettings = const LocationSettings(),
+  }) {
+    return _positionController.stream.map(_toPosition);
+  }
+
+  Position _toPosition(GeoPointPosition p) {
     return Position(
-      latitude: position.lat,
-      longitude: position.lng,
+      latitude: p.lat,
+      longitude: p.lng,
       timestamp: DateTime.fromMillisecondsSinceEpoch(0),
       accuracy: 10,
       altitude: 0,
@@ -49,6 +68,10 @@ class FakeLocationService implements LocationService {
       speed: 0,
       speedAccuracy: 0,
     );
+  }
+
+  void dispose() {
+    _positionController.close();
   }
 }
 

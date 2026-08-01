@@ -8,6 +8,7 @@ meta:
   spec_source: オフライン災害対応アプリ_要件定義書.md
   spec_version: "2026-07-31"
   last_updated: "2026-08-02"
+  branch: feature/search-radius-nav-progress
 
 status_enum: [pending, in_progress, done, blocked, out_of_scope]
 
@@ -123,6 +124,15 @@ prs:
     note: >-
       リリースビルドに tokyo pack.sqlite を assets 同梱し、初回起動時に
       Application Support へ展開。tool/build/release_ios.sh でビルド。
+
+  - id: PR-20
+    title: 探索半径10/20km・S-02プログレスバー・S-03現在地追従（F-04/F-06）
+    status: in_progress
+    features_covered: [F-04, F-06]
+    note: >-
+      ユーザー要望: 3km 初期半径は狭すぎるため 10km/20km に変更（§17 Q10 記録）。
+      探索中 UI フリーズ感の解消のため段階付き LinearProgressIndicator。
+      NavScreen が NavArgs.origin 固定で案内中の GPS 更新を反映していなかった問題を修正。
 
 # 要件定義書 §19 の実装フェーズ
 phases:
@@ -335,3 +345,9 @@ open_questions:
       EvacuationModeJudge の travelExceeded は常に false（テストで固定）。
       要件定義書 §22 Q9 として追記済み。決定次第 HazardGridRepository と
       tools/packgen/hazard.py の両方に列を追加する。
+  - id: Q10
+    item: 避難所探索半径（§4.4 改定）
+    note: >-
+      要件定義書 §4.4 は 3km→10km 拡大だったが、ユーザー要望により
+      初期 10km / 0 件時 20km に変更（2026-08-02）。性能影響はプログレス
+      表示と yield で緩和。監修・要件定義書本体への反映は未。
