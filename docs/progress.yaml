@@ -105,6 +105,14 @@ prs:
       複数県を同時利用する。あわせて locationProvider が requestPermission
       を呼ばず、初回セットアップも起動されていなかったため権限ダイアログが
       出ない問題を修正する。
+  - id: PR-18
+    title: F-09 S-03 経路案内に道路グラフ Polyline 描画を追加
+    status: in_progress
+    features_covered: [F-09]
+    note: >-
+      NavScreen が経路 polyline のみ描画し道路網が表示されなかった。
+      §13 超軽量モードとして pack.loadGraph(bounds:) で bbox 絞り込み読込し
+      薄グレー PolylineLayer を背景に重ねる。MBTiles は Q3 未決のまま。
 
 # 要件定義書 §19 の実装フェーズ
 phases:
@@ -209,6 +217,9 @@ features:
     phase: P1
     status: done
     pr: 19
+    notes: >-
+      PR-18 で S-03 道路グラフ Polyline 背景描画を追加（超軽量モード本体）。
+      MBTiles は Q3 未決。
   - id: F-10
     title: データパック管理（地域単位DL、モデルDL）
     spec_ref: "§14"

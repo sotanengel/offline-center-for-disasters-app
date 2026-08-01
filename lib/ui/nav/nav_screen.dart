@@ -2,13 +2,22 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import '../../app/providers.dart';
+import '../../core/geo/geo_bounds.dart';
 import '../../core/geo/geo_point.dart';
+import '../../data/routing/road_graph.dart';
 import '../../domain/entities/route_result.dart';
+import '../../domain/usecases/destination_planner.dart';
+import 'road_graph_polylines.dart';
+
+/// 地図背景色（§13 超軽量モード: タイルの代わり）。
+const kNavMapBackgroundColor = Color(0xFFE8E4DC);
 
 /// S-03 経路案内（§13 超軽量: タイル無しで道路グラフ Polyline 描画）。
-class NavScreen extends StatefulWidget {
+class NavScreen extends ConsumerStatefulWidget {
   const NavScreen({
     super.key,
     required this.route,
@@ -21,11 +30,66 @@ class NavScreen extends StatefulWidget {
   final bool fallbackBearing;
 
   @override
-  State<NavScreen> createState() => _NavScreenState();
+  ConsumerState<NavScreen> createState() => _NavScreenState();
 }
 
-class _NavScreenState extends State<NavScreen> {
+class _NavScreenState extends ConsumerState<NavScreen> {
   bool _ttsOn = true;
+  final _mapController = MapController();
+  RoadGraph? _roadGraph;
+  var _cameraFitted = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadRoadGraph();
+  }
+
+  Future<void> _loadRoadGraph() async {
+    final pack = await ref.read(dataPackProvider.future);
+    if (!mounted || pack == null) return;
+
+    final bounds = _graphBounds();
+    try {
+      final graph = await pack.loadGraph(bounds: bounds);
+      if (!mounted) return;
+      setState(() => _roadGraph = graph);
+      _fitCameraToRoute();
+    } catch (_) {
+      // グラフ読込失敗時は経路 polyline のみ表示（現状互換）。
+    }
+  }
+
+  GeoBounds _graphBounds() {
+    final route = widget.route;
+    if (route != null && route.polyline.isNotEmpty) {
+      final dest = route.polyline.last;
+      return routeGraphBoundsFor(widget.origin, dest);
+    }
+    return GeoBounds.aroundPoint(widget.origin, radiusKm: 2);
+  }
+
+  void _fitCameraToRoute() {
+    if (_cameraFitted) return;
+    final points = _cameraPoints();
+    if (points.length < 2) return;
+
+    final bounds = LatLngBounds.fromPoints([
+      for (final p in points) LatLng(p.lat, p.lng),
+    ]);
+    _mapController.fitCamera(
+      CameraFit.bounds(bounds: bounds, padding: EdgeInsets.zero),
+    );
+    _cameraFitted = true;
+  }
+
+  List<GeoPoint> _cameraPoints() {
+    final route = widget.route;
+    if (route != null && route.polyline.length >= 2) {
+      return route.polyline;
+    }
+    return [widget.origin];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +105,10 @@ class _NavScreenState extends State<NavScreen> {
         : (route.instructions.isNotEmpty
               ? route.instructions.first.text
               : '直進');
+
+    final roadPolylines = _roadGraph == null
+        ? const <Polyline>[]
+        : roadGraphToPolylines(_roadGraph!);
 
     return Scaffold(
       appBar: AppBar(
@@ -85,14 +153,19 @@ class _NavScreenState extends State<NavScreen> {
           ),
           Expanded(
             child: FlutterMap(
+              mapController: _mapController,
               options: MapOptions(
                 initialCenter: LatLng(widget.origin.lat, widget.origin.lng),
                 initialZoom: 14,
+                backgroundColor: kNavMapBackgroundColor,
                 interactionOptions: const InteractionOptions(
                   flags: InteractiveFlag.all,
                 ),
+                onMapReady: _fitCameraToRoute,
               ),
               children: [
+                if (roadPolylines.isNotEmpty)
+                  PolylineLayer(polylines: roadPolylines),
                 if (route != null && route.polyline.length >= 2)
                   PolylineLayer(
                     polylines: [

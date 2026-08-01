@@ -16,6 +16,7 @@ import 'package:offline_center_for_disasters/ui/result/result_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../helpers/destination_plan_overrides.dart';
+import '../helpers/fake_evacuation_pack.dart';
 
 /// §15.4 アクセシビリティ: タップ領域・Semantics・主要ボタン高さ。
 void main() {
@@ -113,12 +114,16 @@ void main() {
     testWidgets('ResultScreen / NavScreen が dark で描画される', (tester) async {
       SharedPreferences.setMockInitialValues({});
       final prefs = await SharedPreferences.getInstance();
+      final navOverrides = [
+        sharedPreferencesProvider.overrideWithValue(prefs),
+        destinationPlanProviderOverride(),
+        dataPackProvider.overrideWith(
+          (ref) async => FakeEvacuationPack(graph: sampleRoadGraphForNavTest()),
+        ),
+      ];
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            sharedPreferencesProvider.overrideWithValue(prefs),
-            destinationPlanProviderOverride(),
-          ],
+          overrides: navOverrides,
           child: MaterialApp(
             theme: AppTheme.dark(),
             home: const ResultScreen(
@@ -132,10 +137,7 @@ void main() {
 
       await tester.pumpWidget(
         ProviderScope(
-          overrides: [
-            sharedPreferencesProvider.overrideWithValue(prefs),
-            destinationPlanProviderOverride(),
-          ],
+          overrides: navOverrides,
           child: MaterialApp(
             theme: AppTheme.dark(),
             home: NavScreen(
