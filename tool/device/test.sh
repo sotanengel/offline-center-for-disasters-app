@@ -95,15 +95,18 @@ wait "${stall_watch_pid}" 2>/dev/null || true
 
 if [[ -e "${stall_marker}" ]]; then
   rm -f "${stall_marker}"
-  sim_log_error "device-test" "アプリを起動できず停滞したため中断しました"
+  sim_log_error "device-test" "アプリの起動に失敗したため中断しました"
   # 症状（起動できない）は同じでも原因は複数ありうるため、決め打ちせず順に確かめる。
-  if device_log_indicates_automation_permission_denied "${flutter_log}"; then
-    sim_log_error "device-test" \
-      "原因: Mac 側で Xcode の自動操作（Automation）が許可されていません。" \
-      "設定 → プライバシーとセキュリティ → オートメーション で許可してください（iPhone 側の信頼とは別問題）。"
-  elif ! "${SCRIPT_DIR}/ensure_developer_trust.sh" "${DEVICE}"; then
-    sim_log_error "device-test" "原因: 開発者信頼が解除されています。"
+  # いずれも確定診断ではなく手がかりとして案内する。
+  if ! "${SCRIPT_DIR}/ensure_developer_trust.sh" "${DEVICE}"; then
+    sim_log_error "device-test" "開発者信頼が解除されています。"
     device_print_trust_guide
+  elif device_log_indicates_automation_permission_denied "${flutter_log}"; then
+    sim_log_error "device-test" \
+      "開発者信頼は有効。osascript がエラー終了しています。" \
+      "Mac 側の 設定 → プライバシーとセキュリティ → オートメーション で" \
+      "Xcode の自動操作が許可されているか確認してください（未許可が原因の可能性）。"
+    tail -40 "${flutter_log}" >&2 || true
   else
     sim_log_error "device-test" "原因不明。flutter log tail を確認してください:"
     tail -40 "${flutter_log}" >&2 || true

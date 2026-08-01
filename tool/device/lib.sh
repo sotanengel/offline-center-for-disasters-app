@@ -71,11 +71,16 @@ device_app_installed() {
 }
 
 # flutter のログが「アプリを起動できずに停滞している」ことを示すか。
-# 開発者未信頼のときの典型症状で、放置すると無期限にハングする。
+#
+# 注意: 「Xcode is taking longer than expected」は Flutter が 30 秒タイマーで
+# 出す進行中の警告であり、失敗ではない（flutter_tools/lib/src/ios/devices.dart）。
+# Flutter 自身はその後も待機を続けるため、ここで停滞と判定して kill すると
+# 正常に進行中の起動を横から打ち切ってしまう（2026-08-02 実機検証で実際に発生）。
+# 「アプリの起動に失敗した」ことが明言された行のみを停滞とみなす。
 device_log_indicates_launch_stall() {
   local log_file="$1"
   [[ -f "${log_file}" ]] || return 1
-  grep -qE "taking longer than expected to start debugging|Error launching application|Timed out waiting for .* to start" \
+  grep -qE "Error launching application|Could not run .* on |Timed out waiting for .* to start" \
     "${log_file}"
 }
 
@@ -109,11 +114,12 @@ device_restore_app() {
   return 0
 }
 
-# Mac 側で Xcode の自動操作（Automation）許可が下りていないことを示すか。
+# osascript（Xcode 自動操作）がエラー終了したログか。
 #
-# 2026-08-02 実機検証で、この症状（osascript -15）を停滞検知が「開発者未信頼」と
-# 誤って案内した。文言は似て見えるが対処箇所が iPhone 側ではなく Mac 側であり、
-# 混同すると信頼のタップを繰り返すだけで解決しない。
+# 注意: これは exitCode が非ゼロだったことしか見ておらず、原因を確定するもの
+# ではない（未許可以外にも、他プロセスに kill された場合などで同じ文言が出る。
+# 2026-08-02 実機検証では、停滞の誤検知による pkill が原因でこれが出たことがある）。
+# 呼び出し側では「原因の可能性がある」程度の案内にとどめること。
 device_log_indicates_automation_permission_denied() {
   local log_file="$1"
   [[ -f "${log_file}" ]] || return 1

@@ -46,16 +46,21 @@ else
   fail=$((fail + 1))
 fi
 
-# 4) 起動停滞（＝開発者未信頼の典型症状）をログから検知できる
+# 4) 起動停滞をログから検知できる
 tmp_log="$(mktemp "${TMPDIR:-/tmp}/ocd-stall-test.XXXXXX")"
 
+# 2026-08-02 実機検証で判明した回帰: 「Xcode is taking longer than expected」は
+# Flutter が 30 秒タイマーで出す進行中の警告に過ぎず、Flutter 自身はその後も待機を
+# 続ける（flutter_tools/lib/src/ios/devices.dart 参照）。これを停滞と誤判定して
+# pkill すると、正常に進行中だった起動を横から打ち切ってしまう（実際に発生した）。
+# 停滞判定に使ってはならないことを固定する。
 printf 'Installing and launching...\nXcode is taking longer than expected to start debugging the app.\n' >"${tmp_log}"
 if device_log_indicates_launch_stall "${tmp_log}"; then
-  echo "PASS: detects Xcode debug-attach stall"
-  pass=$((pass + 1))
-else
-  echo "FAIL: detects Xcode debug-attach stall"
+  echo "FAIL: 'taking longer than expected' は進行中の警告であり停滞ではない（誤検知は起動を横から打ち切る）"
   fail=$((fail + 1))
+else
+  echo "PASS: 'taking longer than expected' を停滞と誤検知しない"
+  pass=$((pass + 1))
 fi
 
 printf 'Error launching application on sota.\n' >"${tmp_log}"
