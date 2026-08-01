@@ -213,7 +213,7 @@ class _DestinationSummary extends StatelessWidget {
         child: ListTile(
           title: Text('データパック未配置'),
           subtitle: Text(
-            'tool/device/install_pack.sh（実機）または tool/sim/install_pack.sh（シミュレータ）で東京パックを配置してください',
+            'tool/device/install_all_packs.sh（実機）または tool/sim/install_pack.sh（シミュレータ）で地域パックを配置してください',
           ),
         ),
       );

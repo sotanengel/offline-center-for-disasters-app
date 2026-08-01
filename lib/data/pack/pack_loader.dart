@@ -2,7 +2,13 @@ import 'dart:io';
 
 import 'package:drift/drift.dart';
 
+import '../../core/geo/geo_bounds.dart';
+import '../../core/geo/geo_point.dart';
 import '../../core/result/result.dart';
+import '../../domain/entities/hazard_context.dart';
+import '../../domain/entities/shelter_query.dart';
+import '../../data/routing/road_graph.dart';
+import 'evacuation_pack.dart';
 import 'graph_loader.dart';
 import 'hazard_grid_repository.dart';
 import 'pack_database.dart';
@@ -18,8 +24,12 @@ class PackError {
 }
 
 /// 開いた地域パック一式（§14 スキーマ）。
-class DataPack {
+class DataPack implements EvacuationPack {
   DataPack._(this.db, this.metadata);
+
+  /// テスト用（メモリ DB など）。
+  factory DataPack.test(PackDatabase db, Map<String, String> metadata) =>
+      DataPack._(db, metadata);
 
   final PackDatabase db;
 
@@ -30,6 +40,26 @@ class DataPack {
   late final ShelterFinder shelterFinder = ShelterFinder(db, hazardGrid);
   late final GraphLoader graphLoader = GraphLoader(db);
 
+  @override
+  List<String> get regionKeys {
+    final region = metadata['region'];
+    return region == null ? const [] : [region];
+  }
+
+  @override
+  Future<HazardContext> contextAt(GeoPoint p) => hazardGrid.contextAt(p);
+
+  @override
+  Future<ShelterSearchResult> findShelters({
+    required GeoPoint origin,
+    required ShelterQuery query,
+  }) => shelterFinder.find(origin: origin, query: query);
+
+  @override
+  Future<RoadGraph> loadGraph({GeoBounds? bounds}) =>
+      graphLoader.load(bounds: bounds);
+
+  @override
   Future<void> close() => db.close();
 }
 

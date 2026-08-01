@@ -6,7 +6,7 @@ import '../../domain/entities/route_result.dart';
 import '../../domain/entities/shelter.dart';
 import '../../domain/entities/situation_slots.dart';
 import '../../domain/policies/destination_policy.dart';
-import '../../data/pack/pack_loader.dart';
+import '../../data/pack/evacuation_pack.dart';
 import '../../domain/services/route_engine.dart';
 
 /// S-02 避難先候補 + 経路のプレビュー（§9.1 / §4.4）。
@@ -62,7 +62,7 @@ class DestinationPlanner {
   Future<DestinationPlan> plan({
     required SituationSlots slots,
     required GeoPoint origin,
-    DataPack? pack,
+    EvacuationPack? pack,
     RouteEngine? routeEngine,
     RouteEngineFactory? routeEngineFactory,
   }) async {
@@ -70,13 +70,13 @@ class DestinationPlanner {
       return DestinationPlan(origin: origin, packMissing: true);
     }
 
-    final originCtx = await pack.hazardGrid.contextAt(origin);
+    final originCtx = await pack.contextAt(origin);
     final query = _policy.buildQuery(
       slots.disasterType,
       originCtx,
       slots.userState,
     );
-    final search = await pack.shelterFinder.find(origin: origin, query: query);
+    final search = await pack.findShelters(origin: origin, query: query);
 
     if (search.notFound || search.shelters.isEmpty) {
       return DestinationPlan(
@@ -88,7 +88,7 @@ class DestinationPlanner {
 
     final shelter = search.shelters.first;
     final distanceM = haversineM(origin, GeoPoint(shelter.lat, shelter.lng));
-    final shelterContext = await pack.hazardGrid.contextAt(
+    final shelterContext = await pack.contextAt(
       GeoPoint(shelter.lat, shelter.lng),
     );
 

@@ -9,8 +9,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/geo/geo_point.dart';
 import '../core/result/result.dart';
+import '../data/location/location_service.dart';
+import '../data/pack/evacuation_pack.dart';
+import '../data/pack/multi_region_pack.dart';
+import '../data/pack/pack_catalog.dart';
 import '../data/pack/pack_hazard_prior.dart';
 import '../data/pack/pack_loader.dart';
+import '../data/pack/region_pack_info.dart';
+import '../data/pack/region_selector.dart';
 import '../data/prefs/recent_selection_store.dart';
 import '../data/routing/graph_route_engine.dart';
 import '../data/sensors/shake_detector.dart';
@@ -59,20 +65,29 @@ final recentSelectionProvider = FutureProvider<DisasterType?>(
 // 現在地
 // ---------------------------------------------------------------------------
 
+/// 位置情報サービス（テストで [FakeLocationService] 等に差し替え可能）。
+final locationServiceProvider = Provider<LocationService>(
+  (ref) => const GeolocatorLocationService(),
+);
+
 /// 現在地取得のポリシー (§16.3: 既定精度は medium)。
 ///
-/// 権限拒否・GPS 失敗時は null を返す (§3.8: アプリが使えなくならないこと)。
+/// 未許可時は [LocationService.requestPermission] を呼ぶ（F-11）。
+/// 拒否・GPS 失敗時は null を返す (§3.8: アプリが使えなくならないこと)。
 /// テストでは overrideWith で差し替える。
 final locationProvider = FutureProvider<GeoPoint?>((ref) async {
   try {
-    if (!await Geolocator.isLocationServiceEnabled()) return null;
-    final perm = await Geolocator.checkPermission();
-    // §3.8: 起動時にダイアログでブロックしない。未許可なら null で縮退する。
+    final location = ref.watch(locationServiceProvider);
+    if (!await location.isLocationServiceEnabled()) return null;
+    var perm = await location.checkPermission();
+    if (perm == LocationPermission.denied) {
+      perm = await location.requestPermission();
+    }
     if (perm == LocationPermission.denied ||
         perm == LocationPermission.deniedForever) {
       return null;
     }
-    final pos = await Geolocator.getCurrentPosition(
+    final pos = await location.getCurrentPosition(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.medium,
       ),
@@ -88,34 +103,50 @@ final locationProvider = FutureProvider<GeoPoint?>((ref) async {
 // データパック
 // ---------------------------------------------------------------------------
 
-/// 対象地域コード (region key)。初期は tokyo。
-/// S-05 (#12) で永続化・切替を実装するまで固定値とする。
-final currentRegionProvider = Provider<String>((ref) => 'tokyo');
-
-/// 対象パックの絶対パス。application support/packs/[currentRegionProvider]/pack.sqlite。
-final packPathProvider = FutureProvider<String>((ref) async {
-  final region = ref.watch(currentRegionProvider);
+/// Application Support/packs ディレクトリ。
+final packsRootProvider = FutureProvider<Directory>((ref) async {
   final dir = await getApplicationSupportDirectory();
-  return p.join(dir.path, 'packs', region, 'pack.sqlite');
+  return Directory(p.join(dir.path, 'packs'));
 });
 
-/// 開いた [DataPack]。ファイル未取得 / 破損時は null を返して縮退する (§12)。
-final dataPackProvider = FutureProvider<DataPack?>((ref) async {
-  final String path;
+/// 導入済みパックの region/bbox カタログ。
+final installedPackInfosProvider = FutureProvider<List<RegionPackInfo>>((
+  ref,
+) async {
   try {
-    path = await ref.watch(packPathProvider.future);
+    final root = await ref.watch(packsRootProvider.future);
+    return PackCatalog.scan(root);
   } catch (_) {
-    return null; // path_provider が使えない (テスト等)
+    return const <RegionPackInfo>[]; // path_provider が使えない (テスト等)
   }
-  if (!File(path).existsSync()) return null;
-  final res = await PackLoader.open(path);
-  return res.fold(
-    ok: (pack) {
-      ref.onDispose(pack.close);
-      return pack;
-    },
-    err: (_) => null,
-  );
+});
+
+/// 現在地周辺（§4.4 拡大半径 10km）と交差するパックを開いた [EvacuationPack]。
+/// 未配置 / 破損時は null で縮退する (§12)。
+final dataPackProvider = FutureProvider<EvacuationPack?>((ref) async {
+  final infos = await ref.watch(installedPackInfosProvider.future);
+  if (infos.isEmpty) return null;
+  final loc = await ref.watch(locationProvider.future) ?? kDefaultOrigin;
+  final active = selectActiveRegions(origin: loc, installed: infos);
+  if (active.isEmpty) return null;
+
+  final opened = <DataPack>[];
+  for (final info in active) {
+    final res = await PackLoader.open(info.path);
+    final pack = res.valueOrNull;
+    if (pack != null) opened.add(pack);
+  }
+  if (opened.isEmpty) return null;
+
+  final multi = MultiRegionPack(opened);
+  ref.onDispose(multi.close);
+  return multi;
+});
+
+/// 互換: 旧テストが単一パスを差し込む用。未使用時は dataPackProvider に委譲。
+final packPathProvider = FutureProvider<String>((ref) async {
+  final root = await ref.watch(packsRootProvider.future);
+  return p.join(root.path, 'tokyo', 'pack.sqlite');
 });
 
 // ---------------------------------------------------------------------------
@@ -127,7 +158,7 @@ final hazardContextProvider = FutureProvider<HazardContext>((ref) async {
   final pack = await ref.watch(dataPackProvider.future);
   final loc = await ref.watch(locationProvider.future);
   if (pack == null || loc == null) return const HazardContext();
-  return pack.hazardGrid.contextAt(loc);
+  return pack.contextAt(loc);
 });
 
 final hazardPriorScorerProvider = Provider<HazardPriorScorer>(
@@ -139,7 +170,7 @@ final hazardPriorProvider = FutureProvider<HazardPrior>((ref) async {
   final pack = await ref.watch(dataPackProvider.future);
   final scorer = ref.watch(hazardPriorScorerProvider);
   if (pack == null) return _FallbackHazardPrior(scorer);
-  return PackHazardPrior(pack.hazardGrid, scorer);
+  return PackHazardPrior.fromPack(pack, scorer);
 });
 
 /// §3.4-a: ハザードプライア (スコア降順・7 種別すべて)。
@@ -162,10 +193,9 @@ final evacuationModeJudgeProvider = Provider<EvacuationModeJudge>(
   (ref) => const EvacuationModeJudgeImpl(),
 );
 
-/// ShelterFinder はパック依存。パックが無ければ null。
-final shelterFinderProvider = FutureProvider((ref) async {
-  final pack = await ref.watch(dataPackProvider.future);
-  return pack?.shelterFinder;
+/// 避難用パック。無ければ null。
+final shelterFinderProvider = FutureProvider<EvacuationPack?>((ref) async {
+  return ref.watch(dataPackProvider.future);
 });
 
 // 経路グラフのロードは DestinationPlanner が避難先確定後に行う（§16.1）。
@@ -183,7 +213,7 @@ final destinationPlanProvider =
         pack: pack,
         routeEngineFactory: (bounds) async {
           if (pack == null) return null;
-          final graph = await pack.graphLoader.load(bounds: bounds);
+          final graph = await pack.loadGraph(bounds: bounds);
           return GraphRouteEngine(nodes: graph.nodes, edges: graph.edges);
         },
       );
@@ -317,13 +347,19 @@ class OnboardingCompleteNotifier extends AsyncNotifier<bool> {
   }
 }
 
-/// 導入済みパック一覧（初版: ローカル列挙）。
-final packSourceProvider = Provider<PackSource>(
-  (ref) => LocalPackSource({'tokyo'}),
-);
+/// 導入済みパック一覧（ディスク列挙）。
+final packSourceProvider = FutureProvider<PackSource>((ref) async {
+  try {
+    final root = await ref.watch(packsRootProvider.future);
+    return FilesystemPackSource(root);
+  } catch (_) {
+    return LocalPackSource({});
+  }
+});
 
 final installedRegionsProvider = FutureProvider<List<String>>((ref) async {
-  final r = await ref.watch(packSourceProvider).listInstalledRegions();
+  final source = await ref.watch(packSourceProvider.future);
+  final r = await source.listInstalledRegions();
   return switch (r) {
     Ok(value: final v) => v,
     Err() => const [],

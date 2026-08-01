@@ -75,6 +75,36 @@ class GeoBounds {
   bool contains(GeoPoint p) =>
       p.lat >= minLat && p.lat <= maxLat && p.lng >= minLng && p.lng <= maxLng;
 
+  /// 矩形同士が重なる（境界接触を含む）か。
+  bool intersects(GeoBounds other) =>
+      minLat <= other.maxLat &&
+      maxLat >= other.minLat &&
+      minLng <= other.maxLng &&
+      maxLng >= other.minLng;
+
+  /// metadata.bbox JSON `[minLng, minLat, maxLng, maxLat]` を解釈する。
+  static GeoBounds? tryParseBboxJson(String raw) {
+    final trimmed = raw.trim();
+    if (!trimmed.startsWith('[') || !trimmed.endsWith(']')) return null;
+    final parts = trimmed
+        .substring(1, trimmed.length - 1)
+        .split(',')
+        .map((s) => double.tryParse(s.trim()))
+        .toList();
+    if (parts.length != 4 || parts.any((v) => v == null)) return null;
+    final minLng = parts[0]!;
+    final minLat = parts[1]!;
+    final maxLng = parts[2]!;
+    final maxLat = parts[3]!;
+    if (minLat > maxLat || minLng > maxLng) return null;
+    return GeoBounds(
+      minLat: minLat,
+      maxLat: maxLat,
+      minLng: minLng,
+      maxLng: maxLng,
+    );
+  }
+
   @override
   bool operator ==(Object other) =>
       other is GeoBounds &&

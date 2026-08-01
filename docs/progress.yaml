@@ -7,7 +7,7 @@
 meta:
   spec_source: オフライン災害対応アプリ_要件定義書.md
   spec_version: "2026-07-31"
-  last_updated: "2026-08-01"
+  last_updated: "2026-08-02"
 
 status_enum: [pending, in_progress, done, blocked, out_of_scope]
 
@@ -94,6 +94,16 @@ prs:
       テスト後に必ず入れ直す trap を追加して信頼を維持する。
       あわせて実機 integration に壁時計上限と起動停滞検知を追加し、
       ハングではなく失敗として打ち切るようにした。
+  - id: PR-17
+    title: 県境マルチパック同時利用と位置情報権限ダイアログ（F-10 / F-11）
+    status: in_progress
+    features_covered: [F-10, F-11]
+    note: >-
+      currentRegionProvider が tokyo 固定で県境では片県しか使えなかった。
+      導入済みパックをディスク列挙し、現在地の探索半径と bbox が重なる
+      複数県を同時利用する。あわせて locationProvider が requestPermission
+      を呼ばず、初回セットアップも起動されていなかったため権限ダイアログが
+      出ない問題を修正する。
 
 # 要件定義書 §19 の実装フェーズ
 phases:
@@ -204,13 +214,17 @@ features:
     phase: P1
     status: done
     pr: [5, 18]
-    notes: 実機配置は tool/device/install_pack.sh（devicectl）
+    notes: >-
+      実機配置は tool/device/install_pack.sh（devicectl）。
+      PR-17 で導入済みパックのディスク列挙と県境マルチパック同時利用を追加。
   - id: F-11
     title: 初回セットアップ（免責同意、地域パック取得、権限要求）
     spec_ref: "§15"
     phase: P1
     status: done
-    pr: 18
+    pr: [18]
+    notes: >-
+      PR-17 で初回セットアップ起動と位置情報 requestPermission を接続。
 
 # 地域データパック生成状況（Issue #8 で再生成完了 2026-08-01）
 data_packs:

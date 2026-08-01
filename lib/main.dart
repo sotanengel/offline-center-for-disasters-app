@@ -18,18 +18,35 @@ void main() async {
 }
 
 /// アプリのルートウィジェット。
-class OfflineCenterApp extends StatelessWidget {
+///
+/// 初回は S-06（免責・権限）、完了後は S-01 ホーム (F-11)。
+class OfflineCenterApp extends ConsumerWidget {
   const OfflineCenterApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final onboarding = ref.watch(onboardingCompleteProvider);
+
+    if (onboarding.isLoading) {
+      return MaterialApp(
+        key: const ValueKey('app-boot'),
+        theme: AppTheme.light(),
+        darkTheme: AppTheme.dark(),
+        themeMode: ThemeMode.system,
+        home: const Scaffold(body: Center(child: CircularProgressIndicator())),
+      );
+    }
+
+    final done = onboarding.valueOrNull ?? false;
     return MaterialApp(
+      // loading 時の home 付き MaterialApp と State を共有しない
+      key: ValueKey(done ? 'app-home' : 'app-onboarding'),
       title: 'オフライン災害対応センター',
       theme: AppTheme.light(),
       darkTheme: AppTheme.dark(),
       // §15.4: 端末の設定に追従 (日出没ベースの自動切替は S-05 / #12 で拡張)。
       themeMode: ThemeMode.system,
-      initialRoute: AppRoutes.home,
+      initialRoute: done ? AppRoutes.home : AppRoutes.onboarding,
       onGenerateRoute: onGenerateAppRoute,
     );
   }
