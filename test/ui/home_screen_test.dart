@@ -39,7 +39,6 @@ void main() {
     HazardContext ctx = const HazardContext(),
     bool shake = false,
     DisasterType? recent,
-    bool sttAvailable = false,
     void Function(SituationSlots)? onSelect,
   }) async {
     SharedPreferences.setMockInitialValues({});
@@ -54,7 +53,6 @@ void main() {
           hazardContextProvider.overrideWith((ref) async => ctx),
           shakeDetectedProvider.overrideWith((ref) => Stream.value(shake)),
           recentSelectionProvider.overrideWith((ref) async => recent),
-          offlineSttAvailableProvider.overrideWith((ref) async => sttAvailable),
         ],
         child: MaterialApp(home: HomeScreen(onSelect: onSelect)),
       ),
@@ -75,20 +73,17 @@ void main() {
       .emphasized;
 
   group('タイル構成（§3.2）', () {
-    testWidgets('8 種すべて表示される（わからないを含む、MUST）', (tester) async {
+    testWidgets('7 種すべて表示される（確定種別のみ）', (tester) async {
       await pumpHome(tester);
-      for (final label in [
-        '津波',
-        '大雨・洪水',
-        '土砂災害',
-        '地震',
-        '高潮',
-        '火災',
-        '噴火',
-        'わからない',
-      ]) {
+      for (final label in ['津波', '大雨・洪水', '土砂災害', '地震', '高潮', '火災', '噴火']) {
         expect(find.text(label), findsOneWidget);
       }
+    });
+
+    testWidgets('わからないタイルは表示されない', (tester) async {
+      await pumpHome(tester);
+      expect(find.text('わからない'), findsNothing);
+      expect(find.byKey(const Key('tile_unknown')), findsNothing);
     });
 
     testWidgets('スコアが低い種別も非表示にしない（MUST NOT）', (tester) async {
@@ -134,18 +129,20 @@ void main() {
   });
 
   group('揺れ検知（§3.4-b / §20.2）', () {
-    testWidgets('バナー表示 + 地震タイル強調（自動遷移はしない）', (tester) async {
+    testWidgets('バナーなし + 地震タイル強調（自動遷移はしない）', (tester) async {
       await pumpHome(tester, shake: true);
-      expect(find.text('揺れを検知しました'), findsOneWidget);
+      expect(find.text('揺れを検知しました'), findsNothing);
+      expect(find.text('津波の危険があります'), findsNothing);
       expect(tileEmphasized(tester, DisasterType.earthquake), isTrue);
       // 自動画面遷移しない（MUST NOT）: ホームが表示されたまま
       expect(find.text('どの災害から逃げますか？'), findsOneWidget);
     });
 
-    testWidgets('津波想定域内なら津波が最上位 + 危険表示', (tester) async {
+    testWidgets('津波想定域内なら津波が最上位 + バナーなし', (tester) async {
       const ctx = HazardContext(inTsunamiZone: true, distCoastM: 800);
       await pumpHome(tester, ctx: ctx, shake: true);
-      expect(find.text('津波の危険があります'), findsOneWidget);
+      expect(find.text('津波の危険があります'), findsNothing);
+      expect(find.text('揺れを検知しました'), findsNothing);
       // スコア 0 でも揺れ検知により津波が最上位
       expect(
         tilePrecedes(tester, DisasterType.tsunami, DisasterType.earthquake),
@@ -156,7 +153,8 @@ void main() {
 
     testWidgets('揺れなしならバナーなし', (tester) async {
       await pumpHome(tester, shake: false);
-      expect(find.byKey(const Key('shake_banner')), findsNothing);
+      expect(find.text('揺れを検知しました'), findsNothing);
+      expect(find.text('津波の危険があります'), findsNothing);
     });
   });
 
@@ -196,9 +194,10 @@ void main() {
       expect(find.byKey(const Key('one_tap_evacuate')), findsNothing);
     });
 
-    testWidgets('緊急導線「わからない・とにかく逃げたい」は常に表示', (tester) async {
+    testWidgets('緊急導線は表示されない', (tester) async {
       await pumpHome(tester);
-      expect(find.text('わからない・とにかく逃げたい'), findsOneWidget);
+      expect(find.text('わからない・とにかく逃げたい'), findsNothing);
+      expect(find.byKey(const Key('emergency_unknown')), findsNothing);
     });
   });
 
@@ -219,7 +218,6 @@ void main() {
             ),
             shakeDetectedProvider.overrideWith((ref) => Stream.value(false)),
             recentSelectionProvider.overrideWith((ref) async => null),
-            offlineSttAvailableProvider.overrideWith((ref) async => false),
           ],
           child: MaterialApp(home: HomeScreen(onSelect: selected.add)),
         ),
@@ -232,46 +230,9 @@ void main() {
       expect(prefs.getString('recent_disaster_type'), 'tsunami');
     });
 
-    testWidgets('緊急導線タップは unknown として確定する', (tester) async {
-      final selected = <SituationSlots>[];
-      await pumpHome(tester, onSelect: selected.add);
-      await tester.tap(find.byKey(const Key('emergency_unknown')));
-      await tester.pump();
-      expect(selected.map((s) => s.disasterType), [DisasterType.unknown]);
-    });
-
     testWidgets('直近選択は「継続中」として表示される（§3.4-c）', (tester) async {
       await pumpHome(tester, recent: DisasterType.flood);
       expect(find.text('継続中: 大雨・洪水'), findsOneWidget);
-    });
-  });
-
-  group('音声入力（§3.2 L2）', () {
-    testWidgets('オフライン STT 非対応ならマイク非活性 + 理由表示', (tester) async {
-      await pumpHome(tester, sttAvailable: false);
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('mic_button')),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      final mic = tester.widget<IconButton>(
-        find.byKey(const Key('mic_button')),
-      );
-      expect(mic.onPressed, isNull);
-      expect(find.textContaining('オフライン音声認識に未対応'), findsOneWidget);
-    });
-
-    testWidgets('対応端末ではマイクが活性', (tester) async {
-      await pumpHome(tester, sttAvailable: true);
-      await tester.scrollUntilVisible(
-        find.byKey(const Key('mic_button')),
-        200,
-        scrollable: find.byType(Scrollable).first,
-      );
-      final mic = tester.widget<IconButton>(
-        find.byKey(const Key('mic_button')),
-      );
-      expect(mic.onPressed, isNotNull);
     });
   });
 
@@ -281,6 +242,13 @@ void main() {
       // 避難先の断定表示（施設名・案内カード）が存在しないこと
       expect(find.byKey(const Key('destination_summary')), findsNothing);
       expect(find.textContaining('避難所'), findsNothing);
+    });
+
+    testWidgets('自由記述欄・マイク・解析ボタンは表示されない', (tester) async {
+      await pumpHome(tester);
+      expect(find.byKey(const Key('free_text_input')), findsNothing);
+      expect(find.byKey(const Key('mic_button')), findsNothing);
+      expect(find.byKey(const Key('analyze_free_text_button')), findsNothing);
     });
   });
 }
