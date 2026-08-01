@@ -48,9 +48,23 @@ tool/sim/record.sh stop
 
 # 実機へアプリ + データパックを配置（USB 接続・Developer Mode 必須）
 flutter build ios --release && flutter install -d <UDID> --release
+tool/device/ensure_developer_trust.sh <UDID>   # 開発者信頼の確認（未信頼なら手順表示）
 tool/device/list_packs.sh                    # 生成済みパック一覧（関東4県）
 tool/device/install_pack.sh tokyo <UDID>     # 1県のみ
 tool/device/install_all_packs.sh <UDID>      # 4県一括（約1.6GB）
+tool/device/test.sh <UDID>                   # 実機 integration_test 一括
+```
+
+## 実機テストの前提（初回必須）
+
+Personal Team でインストールしたアプリは、**iPhone 側で開発者を信頼**しないと起動できません（Xcode の統合テストも同じ）。
+
+1. **設定 → 一般 → VPNとデバイス管理**
+2. **デベロッパ App** のプロフィール（自分の名前）をタップ
+3. **信頼** をタップ
+
+確認: `tool/device/ensure_developer_trust.sh <UDID>` がエラーなく終わること。
+
 ```
 
 ## iPhone 動作テストの流れ（AI エージェント用）

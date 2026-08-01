@@ -33,7 +33,6 @@ import '../data/llm/model_downloader.dart';
 import '../data/guidance/kb_guidance_service.dart';
 import '../data/pack/pack_source.dart';
 import '../domain/services/guidance_service.dart';
-import '../domain/services/route_engine.dart';
 import '../data/rule/rule_situation_analyzer.dart';
 import '../domain/services/situation_analyzer.dart';
 import '../domain/usecases/destination_planner.dart';
@@ -169,26 +168,24 @@ final shelterFinderProvider = FutureProvider((ref) async {
   return pack?.shelterFinder;
 });
 
-/// RouteEngine はパック依存。パックが無ければ null。
-final routeEngineProvider = FutureProvider<RouteEngine?>((ref) async {
-  final pack = await ref.watch(dataPackProvider.future);
-  if (pack == null) return null;
-  // 現状は全件ロード (bbox 絞り込みは呼び出し側で GraphLoader.load(bounds:...) を使う)。
-  final graph = await pack.graphLoader.load();
-  return GraphRouteEngine(nodes: graph.nodes, edges: graph.edges);
-});
+// 経路グラフのロードは DestinationPlanner が避難先確定後に行う（§16.1）。
+// 現在地から一律の半径で読むと実機では重すぎるため、専用の provider は置かない。
 
 /// S-02: 避難先候補 + 経路プレビュー（§9.1）。
 final destinationPlanProvider =
     FutureProvider.family<DestinationPlan, SituationSlots>((ref, slots) async {
       final loc = await ref.watch(locationProvider.future) ?? kDefaultOrigin;
       final pack = await ref.watch(dataPackProvider.future);
-      final engine = await ref.watch(routeEngineProvider.future);
+      // グラフは避難先が決まってから、その範囲だけ読む（§16.1）。
       return const DestinationPlanner().plan(
         slots: slots,
         origin: loc,
         pack: pack,
-        routeEngine: engine,
+        routeEngineFactory: (bounds) async {
+          if (pack == null) return null;
+          final graph = await pack.graphLoader.load(bounds: bounds);
+          return GraphRouteEngine(nodes: graph.nodes, edges: graph.edges);
+        },
       );
     });
 

@@ -1,0 +1,5 @@
+// 個人開発用: このファイルを Personal.xcconfig にコピーし、
+// Xcode → Settings → Accounts で確認できる Personal Team の ID を設定する。
+// Personal.xcconfig は git 管理外（.gitignore 済み）。
+//
+// DEVELOPMENT_TEAM = XXXXXXXXXX
