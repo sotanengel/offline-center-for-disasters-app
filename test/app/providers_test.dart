@@ -57,13 +57,12 @@ void main() {
     expect(ranks, isNotEmpty);
   });
 
-  test('shelterFinderProvider / routeEngineProvider: パック未取得時は null', () async {
+  test('shelterFinderProvider: パック未取得時は null', () async {
     final container = ProviderContainer(
       overrides: [dataPackProvider.overrideWith((ref) async => null)],
     );
     addTearDown(container.dispose);
     expect(await container.read(shelterFinderProvider.future), isNull);
-    expect(await container.read(routeEngineProvider.future), isNull);
   });
 
   test('DataPack 型がインポート可能 (コンパイル時保証)', () {

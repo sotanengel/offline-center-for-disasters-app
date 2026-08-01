@@ -29,6 +29,44 @@ class GeoBounds {
     );
   }
 
+  /// [points] すべてを覆い、[marginKm] だけ外側に広げた bbox。
+  ///
+  /// 経路グラフを「現在地から半径 N km」で読むと範囲が広くなりすぎるため
+  /// （東京パックの半径 12km で 61 万ノード）、現在地と避難先が確定した後に
+  /// 両者を覆う最小範囲だけ読むために使う（§16.1）。
+  factory GeoBounds.covering(
+    List<GeoPoint> points, {
+    required double marginKm,
+  }) {
+    if (points.isEmpty) {
+      throw ArgumentError.value(points, 'points', 'must not be empty');
+    }
+    var minLat = points.first.lat;
+    var maxLat = points.first.lat;
+    var minLng = points.first.lng;
+    var maxLng = points.first.lng;
+    for (final p in points.skip(1)) {
+      if (p.lat < minLat) minLat = p.lat;
+      if (p.lat > maxLat) maxLat = p.lat;
+      if (p.lng < minLng) minLng = p.lng;
+      if (p.lng > maxLng) maxLng = p.lng;
+    }
+
+    // 度換算は aroundPoint と同じ近似を使う。
+    final latMargin = marginKm / 110.94;
+    final cosLat = math.cos(((minLat + maxLat) / 2) * math.pi / 180);
+    final lngMargin = cosLat.abs() < 1e-6
+        ? 180.0
+        : marginKm / (111.32 * cosLat.abs());
+
+    return GeoBounds(
+      minLat: minLat - latMargin,
+      maxLat: maxLat + latMargin,
+      minLng: minLng - lngMargin,
+      maxLng: maxLng + lngMargin,
+    );
+  }
+
   final double minLat;
   final double maxLat;
   final double minLng;

@@ -10,6 +10,8 @@ required_keys=(
   NSMicrophoneUsageDescription
   NSSpeechRecognitionUsageDescription
   NSMotionUsageDescription
+  NSLocalNetworkUsageDescription
+  NSBonjourServices
 )
 
 missing=0
