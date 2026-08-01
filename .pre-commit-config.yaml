@@ -27,7 +27,9 @@ repos:
 
       - id: flutter-analyze
         name: flutter analyze
-        entry: flutter analyze
+        # git worktree からのコミット時は GIT_DIR 等がフックに漏洩し、
+        # Flutter SDK が自身のバージョンを解決できなくなるため除去する
+        entry: bash -c 'unset GIT_DIR GIT_WORK_TREE GIT_INDEX_FILE; exec flutter analyze' --
         language: system
         pass_filenames: false
         always_run: true

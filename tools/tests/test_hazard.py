@@ -91,6 +91,24 @@ def test_landslide_gml_sets_special_warning_class(tmp_path):
     assert all(cls == 2 for (cls,) in rows)  # 特別警戒区域
 
 
+def test_shift_jis_gml_is_imported(tmp_path):
+    """国土数値情報の実データは Shift_JIS の場合がある（実運用で発生した不具合の回帰）。"""
+    db = init_db(tmp_path / "pack.sqlite")
+    gml = tmp_path / "flood_sjis.xml"
+    sjis = GML_FIXTURE.replace(
+        '<?xml version="1.0" encoding="UTF-8"?>',
+        '<?xml version="1.0" encoding="Shift_JIS"?>',
+    ).replace(
+        "<ksj:depthRankMax>2</ksj:depthRankMax>",
+        "<ksj:depthRankMax>2</ksj:depthRankMax><ksj:name>荒川浸水想定</ksj:name>",
+    )
+    gml.write_bytes(sjis.encode("cp932"))
+    import_flood_gml(db, gml)
+    rows = db.execute("SELECT flood_depth_m FROM hazard_grid").fetchall()
+    assert len(rows) > 0
+    assert all(depth == 3.0 for (depth,) in rows)
+
+
 def test_flood_and_landslide_merge_into_same_cells(tmp_path):
     db = init_db(tmp_path / "pack.sqlite")
     f1 = tmp_path / "flood.xml"

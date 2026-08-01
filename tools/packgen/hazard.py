@@ -10,6 +10,7 @@ cell_id = floor(lat*2000) * 1_000_000 + floor(lng*2000)（int64、決定論的�
 from __future__ import annotations
 
 import math
+import re
 import sqlite3
 import xml.etree.ElementTree as ET
 from pathlib import Path
@@ -41,9 +42,27 @@ def _parse_poslist(text: str) -> list[tuple[float, float]]:
     return [(nums[i + 1], nums[i]) for i in range(0, len(nums) - 1, 2)]
 
 
+_ENCODING_DECL = re.compile(rb'(<\?xml[^>]*?)encoding="[^"]*"')
+
+
+def _read_xml_text(path: str | Path) -> str:
+    """XML をバイト列からデコードする。
+
+    国土数値情報の GML は Shift_JIS の場合があり、ElementTree は
+    マルチバイトエンコーディング宣言を直接扱えないため自前でデコードする。
+    """
+    raw = Path(path).read_bytes()
+    try:
+        text = raw.decode("utf-8")
+    except UnicodeDecodeError:
+        text = raw.decode("cp932")
+    # エンコーディング宣言を除去（str 解析時に宣言があると ValueError になる）
+    return re.sub(r'(<\?xml[^>]*?)encoding="[^"]*"', r"\1", text, count=1)
+
+
 def _iter_features(gml_path: str | Path):
     """GML から (属性dict, Polygon) を列挙する。属性名は名前空間を除去して比較。"""
-    tree = ET.parse(str(gml_path))
+    tree = ET.ElementTree(ET.fromstring(_read_xml_text(gml_path)))
     for member in tree.iter():
         if _local(member.tag) != "featureMember":
             continue
