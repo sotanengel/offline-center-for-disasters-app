@@ -96,9 +96,11 @@ class DestinationPlanner {
     // 実機では重すぎるため、現在地と避難先を覆う範囲だけに絞る。
     var engine = routeEngine;
     if (engine == null && routeEngineFactory != null) {
-      engine = await routeEngineFactory(
-        routeGraphBoundsFor(origin, GeoPoint(shelter.lat, shelter.lng)),
+      final bounds = routeGraphBoundsFor(
+        origin,
+        GeoPoint(shelter.lat, shelter.lng),
       );
+      engine = await routeEngineFactory(bounds);
     }
 
     RouteResult? route;

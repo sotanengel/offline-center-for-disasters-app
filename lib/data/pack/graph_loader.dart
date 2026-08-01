@@ -64,21 +64,37 @@ class GraphLoader {
       if (nodes.isEmpty) {
         return RoadGraph(nodes: const {}, edges: const []);
       }
-      // 両端ノードが bbox 内にあるエッジのみを取得する
-      // (IN 句をノード ID 列にバインド)
-      final ids = nodes.keys.toList();
-      final placeholders = List.filled(ids.length, '?').join(',');
+      // 両端ノードが bbox 内にあるエッジのみを取得する。
+      //
+      // 以前はヒットしたノード ID を IN 句にバインドしていたが、バインド
+      // 変数がノード数に比例して増える（東京パックの近傍ケースで 11 万件
+      // → 22 万バインド）。デスクトップでは SQLite のバインド変数上限を
+      // 超えて SqliteException（too many SQL variables）になり、実機の
+      // iOS 標準 SQLite ではエラーにはならないが大量のバインド処理その
+      // ものが致命的に遅く、S-02 が実機で完了しなかった（2026-08-02）。
+      // bbox 条件を nodes 側の JOIN として書き、バインド変数を bbox の
+      // 8 個だけに固定する（ヒット件数に依存しない）。
       final edgeRows = await _db
           .customSelect(
-            'SELECT id, from_node, to_node, length_m, geometry, way_type,'
-            ' width_class, has_steps, is_lit, hz_flood_depth, hz_tsunami_depth,'
-            ' hz_landslide, hz_storm_surge, hz_volcano, near_river, dense_wood,'
-            ' landmark_name FROM edges'
-            ' WHERE from_node IN ($placeholders)'
-            ' AND to_node IN ($placeholders)',
+            'SELECT e.id, e.from_node, e.to_node, e.length_m, e.geometry,'
+            ' e.way_type, e.width_class, e.has_steps, e.is_lit,'
+            ' e.hz_flood_depth, e.hz_tsunami_depth, e.hz_landslide,'
+            ' e.hz_storm_surge, e.hz_volcano, e.near_river, e.dense_wood,'
+            ' e.landmark_name'
+            ' FROM edges e'
+            ' JOIN nodes n1 ON e.from_node = n1.id'
+            ' JOIN nodes n2 ON e.to_node = n2.id'
+            ' WHERE n1.lat BETWEEN ? AND ? AND n1.lng BETWEEN ? AND ?'
+            ' AND n2.lat BETWEEN ? AND ? AND n2.lng BETWEEN ? AND ?',
             variables: [
-              for (final id in ids) Variable.withInt(id),
-              for (final id in ids) Variable.withInt(id),
+              Variable.withReal(bounds.minLat),
+              Variable.withReal(bounds.maxLat),
+              Variable.withReal(bounds.minLng),
+              Variable.withReal(bounds.maxLng),
+              Variable.withReal(bounds.minLat),
+              Variable.withReal(bounds.maxLat),
+              Variable.withReal(bounds.minLng),
+              Variable.withReal(bounds.maxLng),
             ],
           )
           .get();
