@@ -47,10 +47,11 @@ tool/sim/record.sh start out.mov
 tool/sim/record.sh stop
 
 # 実機へアプリ + データパックを配置（USB 接続・Developer Mode 必須）
+tool/build/release_ios.sh                    # 同梱パック込みリリースビルド（推奨）
 flutter build ios --release && flutter install -d <UDID> --release
 tool/device/ensure_developer_trust.sh <UDID>   # 開発者信頼の確認（未信頼なら手順表示）
 tool/device/list_packs.sh                    # 生成済みパック一覧（関東4県）
-tool/device/install_pack.sh tokyo <UDID>     # 1県のみ
+tool/device/install_pack.sh tokyo <UDID>     # 追加地域のみ手動配置（同梱は tokyo）
 tool/device/install_all_packs.sh <UDID>      # 4県一括（約1.6GB）
 tool/device/test.sh <UDID>                   # 実機 integration_test 一括
 ```

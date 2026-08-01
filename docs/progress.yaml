@@ -112,7 +112,15 @@ prs:
     note: >-
       NavScreen が経路 polyline のみ描画し道路網が表示されなかった。
       §13 超軽量モードとして pack.loadGraph(bounds:) で bbox 絞り込み読込し
-      薄グレー PolylineLayer を背景に重ねる。MBTiles は Q3 未決のまま。
+      薄グレー PolylineLayer を背景に重ねる。      MBTiles は Q3 未決のまま。
+
+  - id: PR-19
+    title: アプリ同梱データパック（東京）初回展開
+    status: in_progress
+    features_covered: [F-10]
+    note: >-
+      リリースビルドに tokyo pack.sqlite を assets 同梱し、初回起動時に
+      Application Support へ展開。tool/build/release_ios.sh でビルド。
 
 # 要件定義書 §19 の実装フェーズ
 phases:

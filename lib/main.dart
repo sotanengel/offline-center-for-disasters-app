@@ -1,14 +1,27 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
+import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'app/providers.dart';
 import 'app/routes.dart';
 import 'app/theme.dart';
+import 'data/pack/bundled_pack_installer.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
+  try {
+    final supportDir = await getApplicationSupportDirectory();
+    await BundledPackInstaller.ensureInstalled(
+      Directory(p.join(supportDir.path, 'packs')),
+    );
+  } catch (_) {
+    // path_provider 非対応環境（一部テスト）ではスキップ
+  }
   runApp(
     ProviderScope(
       overrides: [sharedPreferencesProvider.overrideWithValue(prefs)],
