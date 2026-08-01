@@ -96,7 +96,7 @@ prs:
       ハングではなく失敗として打ち切るようにした。
   - id: PR-17
     title: 県境マルチパック同時利用と位置情報権限ダイアログ（F-10 / F-11）
-    status: in_progress
+    status: done
     pr: 25
     features_covered: [F-10, F-11]
     note: >-
