@@ -43,3 +43,12 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# データパイプライン生成物・キャッシュ
+tools/data/
+tools/out/
+tools/.venv/
+__pycache__/
+
+# シミュレータキャプチャ
+screenshots/
