@@ -3,8 +3,11 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
+      # 生成ファイル（freezed 等）は生成器の出力をそのまま保持するため対象外
       - id: trailing-whitespace
+        exclude: \.(freezed|g)\.dart$
       - id: end-of-file-fixer
+        exclude: \.(freezed|g)\.dart$
       - id: check-yaml
       - id: check-added-large-files
         args: [--maxkb=1024]

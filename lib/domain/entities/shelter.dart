@@ -27,6 +27,9 @@ abstract class Shelter with _$Shelter {
     @Default(false) bool isShelter,
     @Default(false) bool barrierFree,
     int? capacity,
+
+    /// パック生成時にスナップ済みの最近接ノード（§14.1 nearest_node_id）
+    int? nearestNodeId,
     String? note,
   }) = _Shelter;
 }

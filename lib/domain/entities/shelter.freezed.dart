@@ -14,7 +14,8 @@ T _$identity<T>(T value) => value;
 /// @nodoc
 mixin _$Shelter {
 
- String get id; String get name; double get lat; double get lng; double? get elevationM; bool get okFlood; bool get okLandslide; bool get okStormSurge; bool get okEarthquake; bool get okTsunami; bool get okFire; bool get okInlandFlood; bool get okVolcano; bool get isAllHazard; PlaceClass get placeClass; double? get usableFloorHeightM; bool get isShelter; bool get barrierFree; int? get capacity; String? get note;
+ String get id; String get name; double get lat; double get lng; double? get elevationM; bool get okFlood; bool get okLandslide; bool get okStormSurge; bool get okEarthquake; bool get okTsunami; bool get okFire; bool get okInlandFlood; bool get okVolcano; bool get isAllHazard; PlaceClass get placeClass; double? get usableFloorHeightM; bool get isShelter; bool get barrierFree; int? get capacity;/// パック生成時にスナップ済みの最近接ノード（§14.1 nearest_node_id）
+ int? get nearestNodeId; String? get note;
 /// Create a copy of Shelter
 /// with the given fields replaced by the non-null parameter values.
 @JsonKey(includeFromJson: false, includeToJson: false)
@@ -25,16 +26,16 @@ $ShelterCopyWith<Shelter> get copyWith => _$ShelterCopyWithImpl<Shelter>(this as
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is Shelter&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.elevationM, elevationM) || other.elevationM == elevationM)&&(identical(other.okFlood, okFlood) || other.okFlood == okFlood)&&(identical(other.okLandslide, okLandslide) || other.okLandslide == okLandslide)&&(identical(other.okStormSurge, okStormSurge) || other.okStormSurge == okStormSurge)&&(identical(other.okEarthquake, okEarthquake) || other.okEarthquake == okEarthquake)&&(identical(other.okTsunami, okTsunami) || other.okTsunami == okTsunami)&&(identical(other.okFire, okFire) || other.okFire == okFire)&&(identical(other.okInlandFlood, okInlandFlood) || other.okInlandFlood == okInlandFlood)&&(identical(other.okVolcano, okVolcano) || other.okVolcano == okVolcano)&&(identical(other.isAllHazard, isAllHazard) || other.isAllHazard == isAllHazard)&&(identical(other.placeClass, placeClass) || other.placeClass == placeClass)&&(identical(other.usableFloorHeightM, usableFloorHeightM) || other.usableFloorHeightM == usableFloorHeightM)&&(identical(other.isShelter, isShelter) || other.isShelter == isShelter)&&(identical(other.barrierFree, barrierFree) || other.barrierFree == barrierFree)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&(identical(other.note, note) || other.note == note));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is Shelter&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.elevationM, elevationM) || other.elevationM == elevationM)&&(identical(other.okFlood, okFlood) || other.okFlood == okFlood)&&(identical(other.okLandslide, okLandslide) || other.okLandslide == okLandslide)&&(identical(other.okStormSurge, okStormSurge) || other.okStormSurge == okStormSurge)&&(identical(other.okEarthquake, okEarthquake) || other.okEarthquake == okEarthquake)&&(identical(other.okTsunami, okTsunami) || other.okTsunami == okTsunami)&&(identical(other.okFire, okFire) || other.okFire == okFire)&&(identical(other.okInlandFlood, okInlandFlood) || other.okInlandFlood == okInlandFlood)&&(identical(other.okVolcano, okVolcano) || other.okVolcano == okVolcano)&&(identical(other.isAllHazard, isAllHazard) || other.isAllHazard == isAllHazard)&&(identical(other.placeClass, placeClass) || other.placeClass == placeClass)&&(identical(other.usableFloorHeightM, usableFloorHeightM) || other.usableFloorHeightM == usableFloorHeightM)&&(identical(other.isShelter, isShelter) || other.isShelter == isShelter)&&(identical(other.barrierFree, barrierFree) || other.barrierFree == barrierFree)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&(identical(other.nearestNodeId, nearestNodeId) || other.nearestNodeId == nearestNodeId)&&(identical(other.note, note) || other.note == note));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,id,name,lat,lng,elevationM,okFlood,okLandslide,okStormSurge,okEarthquake,okTsunami,okFire,okInlandFlood,okVolcano,isAllHazard,placeClass,usableFloorHeightM,isShelter,barrierFree,capacity,note]);
+int get hashCode => Object.hashAll([runtimeType,id,name,lat,lng,elevationM,okFlood,okLandslide,okStormSurge,okEarthquake,okTsunami,okFire,okInlandFlood,okVolcano,isAllHazard,placeClass,usableFloorHeightM,isShelter,barrierFree,capacity,nearestNodeId,note]);
 
 @override
 String toString() {
-  return 'Shelter(id: $id, name: $name, lat: $lat, lng: $lng, elevationM: $elevationM, okFlood: $okFlood, okLandslide: $okLandslide, okStormSurge: $okStormSurge, okEarthquake: $okEarthquake, okTsunami: $okTsunami, okFire: $okFire, okInlandFlood: $okInlandFlood, okVolcano: $okVolcano, isAllHazard: $isAllHazard, placeClass: $placeClass, usableFloorHeightM: $usableFloorHeightM, isShelter: $isShelter, barrierFree: $barrierFree, capacity: $capacity, note: $note)';
+  return 'Shelter(id: $id, name: $name, lat: $lat, lng: $lng, elevationM: $elevationM, okFlood: $okFlood, okLandslide: $okLandslide, okStormSurge: $okStormSurge, okEarthquake: $okEarthquake, okTsunami: $okTsunami, okFire: $okFire, okInlandFlood: $okInlandFlood, okVolcano: $okVolcano, isAllHazard: $isAllHazard, placeClass: $placeClass, usableFloorHeightM: $usableFloorHeightM, isShelter: $isShelter, barrierFree: $barrierFree, capacity: $capacity, nearestNodeId: $nearestNodeId, note: $note)';
 }
 
 
@@ -45,7 +46,7 @@ abstract mixin class $ShelterCopyWith<$Res>  {
   factory $ShelterCopyWith(Shelter value, $Res Function(Shelter) _then) = _$ShelterCopyWithImpl;
 @useResult
 $Res call({
- String id, String name, double lat, double lng, double? elevationM, bool okFlood, bool okLandslide, bool okStormSurge, bool okEarthquake, bool okTsunami, bool okFire, bool okInlandFlood, bool okVolcano, bool isAllHazard, PlaceClass placeClass, double? usableFloorHeightM, bool isShelter, bool barrierFree, int? capacity, String? note
+ String id, String name, double lat, double lng, double? elevationM, bool okFlood, bool okLandslide, bool okStormSurge, bool okEarthquake, bool okTsunami, bool okFire, bool okInlandFlood, bool okVolcano, bool isAllHazard, PlaceClass placeClass, double? usableFloorHeightM, bool isShelter, bool barrierFree, int? capacity, int? nearestNodeId, String? note
 });
 
 
@@ -62,7 +63,7 @@ class _$ShelterCopyWithImpl<$Res>
 
 /// Create a copy of Shelter
 /// with the given fields replaced by the non-null parameter values.
-@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? lat = null,Object? lng = null,Object? elevationM = freezed,Object? okFlood = null,Object? okLandslide = null,Object? okStormSurge = null,Object? okEarthquake = null,Object? okTsunami = null,Object? okFire = null,Object? okInlandFlood = null,Object? okVolcano = null,Object? isAllHazard = null,Object? placeClass = null,Object? usableFloorHeightM = freezed,Object? isShelter = null,Object? barrierFree = null,Object? capacity = freezed,Object? note = freezed,}) {
+@pragma('vm:prefer-inline') @override $Res call({Object? id = null,Object? name = null,Object? lat = null,Object? lng = null,Object? elevationM = freezed,Object? okFlood = null,Object? okLandslide = null,Object? okStormSurge = null,Object? okEarthquake = null,Object? okTsunami = null,Object? okFire = null,Object? okInlandFlood = null,Object? okVolcano = null,Object? isAllHazard = null,Object? placeClass = null,Object? usableFloorHeightM = freezed,Object? isShelter = null,Object? barrierFree = null,Object? capacity = freezed,Object? nearestNodeId = freezed,Object? note = freezed,}) {
   return _then(_self.copyWith(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -83,6 +84,7 @@ as PlaceClass,usableFloorHeightM: freezed == usableFloorHeightM ? _self.usableFl
 as double?,isShelter: null == isShelter ? _self.isShelter : isShelter // ignore: cast_nullable_to_non_nullable
 as bool,barrierFree: null == barrierFree ? _self.barrierFree : barrierFree // ignore: cast_nullable_to_non_nullable
 as bool,capacity: freezed == capacity ? _self.capacity : capacity // ignore: cast_nullable_to_non_nullable
+as int?,nearestNodeId: freezed == nearestNodeId ? _self.nearestNodeId : nearestNodeId // ignore: cast_nullable_to_non_nullable
 as int?,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
@@ -169,10 +171,10 @@ return $default(_that);case _:
 /// }
 /// ```
 
-@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  double lat,  double lng,  double? elevationM,  bool okFlood,  bool okLandslide,  bool okStormSurge,  bool okEarthquake,  bool okTsunami,  bool okFire,  bool okInlandFlood,  bool okVolcano,  bool isAllHazard,  PlaceClass placeClass,  double? usableFloorHeightM,  bool isShelter,  bool barrierFree,  int? capacity,  String? note)?  $default,{required TResult orElse(),}) {final _that = this;
+@optionalTypeArgs TResult maybeWhen<TResult extends Object?>(TResult Function( String id,  String name,  double lat,  double lng,  double? elevationM,  bool okFlood,  bool okLandslide,  bool okStormSurge,  bool okEarthquake,  bool okTsunami,  bool okFire,  bool okInlandFlood,  bool okVolcano,  bool isAllHazard,  PlaceClass placeClass,  double? usableFloorHeightM,  bool isShelter,  bool barrierFree,  int? capacity,  int? nearestNodeId,  String? note)?  $default,{required TResult orElse(),}) {final _that = this;
 switch (_that) {
 case _Shelter() when $default != null:
-return $default(_that.id,_that.name,_that.lat,_that.lng,_that.elevationM,_that.okFlood,_that.okLandslide,_that.okStormSurge,_that.okEarthquake,_that.okTsunami,_that.okFire,_that.okInlandFlood,_that.okVolcano,_that.isAllHazard,_that.placeClass,_that.usableFloorHeightM,_that.isShelter,_that.barrierFree,_that.capacity,_that.note);case _:
+return $default(_that.id,_that.name,_that.lat,_that.lng,_that.elevationM,_that.okFlood,_that.okLandslide,_that.okStormSurge,_that.okEarthquake,_that.okTsunami,_that.okFire,_that.okInlandFlood,_that.okVolcano,_that.isAllHazard,_that.placeClass,_that.usableFloorHeightM,_that.isShelter,_that.barrierFree,_that.capacity,_that.nearestNodeId,_that.note);case _:
   return orElse();
 
 }
@@ -190,10 +192,10 @@ return $default(_that.id,_that.name,_that.lat,_that.lng,_that.elevationM,_that.o
 /// }
 /// ```
 
-@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  double lat,  double lng,  double? elevationM,  bool okFlood,  bool okLandslide,  bool okStormSurge,  bool okEarthquake,  bool okTsunami,  bool okFire,  bool okInlandFlood,  bool okVolcano,  bool isAllHazard,  PlaceClass placeClass,  double? usableFloorHeightM,  bool isShelter,  bool barrierFree,  int? capacity,  String? note)  $default,) {final _that = this;
+@optionalTypeArgs TResult when<TResult extends Object?>(TResult Function( String id,  String name,  double lat,  double lng,  double? elevationM,  bool okFlood,  bool okLandslide,  bool okStormSurge,  bool okEarthquake,  bool okTsunami,  bool okFire,  bool okInlandFlood,  bool okVolcano,  bool isAllHazard,  PlaceClass placeClass,  double? usableFloorHeightM,  bool isShelter,  bool barrierFree,  int? capacity,  int? nearestNodeId,  String? note)  $default,) {final _that = this;
 switch (_that) {
 case _Shelter():
-return $default(_that.id,_that.name,_that.lat,_that.lng,_that.elevationM,_that.okFlood,_that.okLandslide,_that.okStormSurge,_that.okEarthquake,_that.okTsunami,_that.okFire,_that.okInlandFlood,_that.okVolcano,_that.isAllHazard,_that.placeClass,_that.usableFloorHeightM,_that.isShelter,_that.barrierFree,_that.capacity,_that.note);case _:
+return $default(_that.id,_that.name,_that.lat,_that.lng,_that.elevationM,_that.okFlood,_that.okLandslide,_that.okStormSurge,_that.okEarthquake,_that.okTsunami,_that.okFire,_that.okInlandFlood,_that.okVolcano,_that.isAllHazard,_that.placeClass,_that.usableFloorHeightM,_that.isShelter,_that.barrierFree,_that.capacity,_that.nearestNodeId,_that.note);case _:
   throw StateError('Unexpected subclass');
 
 }
@@ -210,10 +212,10 @@ return $default(_that.id,_that.name,_that.lat,_that.lng,_that.elevationM,_that.o
 /// }
 /// ```
 
-@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  double lat,  double lng,  double? elevationM,  bool okFlood,  bool okLandslide,  bool okStormSurge,  bool okEarthquake,  bool okTsunami,  bool okFire,  bool okInlandFlood,  bool okVolcano,  bool isAllHazard,  PlaceClass placeClass,  double? usableFloorHeightM,  bool isShelter,  bool barrierFree,  int? capacity,  String? note)?  $default,) {final _that = this;
+@optionalTypeArgs TResult? whenOrNull<TResult extends Object?>(TResult? Function( String id,  String name,  double lat,  double lng,  double? elevationM,  bool okFlood,  bool okLandslide,  bool okStormSurge,  bool okEarthquake,  bool okTsunami,  bool okFire,  bool okInlandFlood,  bool okVolcano,  bool isAllHazard,  PlaceClass placeClass,  double? usableFloorHeightM,  bool isShelter,  bool barrierFree,  int? capacity,  int? nearestNodeId,  String? note)?  $default,) {final _that = this;
 switch (_that) {
 case _Shelter() when $default != null:
-return $default(_that.id,_that.name,_that.lat,_that.lng,_that.elevationM,_that.okFlood,_that.okLandslide,_that.okStormSurge,_that.okEarthquake,_that.okTsunami,_that.okFire,_that.okInlandFlood,_that.okVolcano,_that.isAllHazard,_that.placeClass,_that.usableFloorHeightM,_that.isShelter,_that.barrierFree,_that.capacity,_that.note);case _:
+return $default(_that.id,_that.name,_that.lat,_that.lng,_that.elevationM,_that.okFlood,_that.okLandslide,_that.okStormSurge,_that.okEarthquake,_that.okTsunami,_that.okFire,_that.okInlandFlood,_that.okVolcano,_that.isAllHazard,_that.placeClass,_that.usableFloorHeightM,_that.isShelter,_that.barrierFree,_that.capacity,_that.nearestNodeId,_that.note);case _:
   return null;
 
 }
@@ -225,8 +227,8 @@ return $default(_that.id,_that.name,_that.lat,_that.lng,_that.elevationM,_that.o
 
 
 class _Shelter implements Shelter {
-  const _Shelter({required this.id, required this.name, required this.lat, required this.lng, this.elevationM, this.okFlood = false, this.okLandslide = false, this.okStormSurge = false, this.okEarthquake = false, this.okTsunami = false, this.okFire = false, this.okInlandFlood = false, this.okVolcano = false, this.isAllHazard = false, this.placeClass = PlaceClass.unknownOrBuilding, this.usableFloorHeightM, this.isShelter = false, this.barrierFree = false, this.capacity, this.note});
-
+  const _Shelter({required this.id, required this.name, required this.lat, required this.lng, this.elevationM, this.okFlood = false, this.okLandslide = false, this.okStormSurge = false, this.okEarthquake = false, this.okTsunami = false, this.okFire = false, this.okInlandFlood = false, this.okVolcano = false, this.isAllHazard = false, this.placeClass = PlaceClass.unknownOrBuilding, this.usableFloorHeightM, this.isShelter = false, this.barrierFree = false, this.capacity, this.nearestNodeId, this.note});
+  
 
 @override final  String id;
 @override final  String name;
@@ -247,6 +249,8 @@ class _Shelter implements Shelter {
 @override@JsonKey() final  bool isShelter;
 @override@JsonKey() final  bool barrierFree;
 @override final  int? capacity;
+/// パック生成時にスナップ済みの最近接ノード（§14.1 nearest_node_id）
+@override final  int? nearestNodeId;
 @override final  String? note;
 
 /// Create a copy of Shelter
@@ -259,16 +263,16 @@ _$ShelterCopyWith<_Shelter> get copyWith => __$ShelterCopyWithImpl<_Shelter>(thi
 
 @override
 bool operator ==(Object other) {
-  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Shelter&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.elevationM, elevationM) || other.elevationM == elevationM)&&(identical(other.okFlood, okFlood) || other.okFlood == okFlood)&&(identical(other.okLandslide, okLandslide) || other.okLandslide == okLandslide)&&(identical(other.okStormSurge, okStormSurge) || other.okStormSurge == okStormSurge)&&(identical(other.okEarthquake, okEarthquake) || other.okEarthquake == okEarthquake)&&(identical(other.okTsunami, okTsunami) || other.okTsunami == okTsunami)&&(identical(other.okFire, okFire) || other.okFire == okFire)&&(identical(other.okInlandFlood, okInlandFlood) || other.okInlandFlood == okInlandFlood)&&(identical(other.okVolcano, okVolcano) || other.okVolcano == okVolcano)&&(identical(other.isAllHazard, isAllHazard) || other.isAllHazard == isAllHazard)&&(identical(other.placeClass, placeClass) || other.placeClass == placeClass)&&(identical(other.usableFloorHeightM, usableFloorHeightM) || other.usableFloorHeightM == usableFloorHeightM)&&(identical(other.isShelter, isShelter) || other.isShelter == isShelter)&&(identical(other.barrierFree, barrierFree) || other.barrierFree == barrierFree)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&(identical(other.note, note) || other.note == note));
+  return identical(this, other) || (other.runtimeType == runtimeType&&other is _Shelter&&(identical(other.id, id) || other.id == id)&&(identical(other.name, name) || other.name == name)&&(identical(other.lat, lat) || other.lat == lat)&&(identical(other.lng, lng) || other.lng == lng)&&(identical(other.elevationM, elevationM) || other.elevationM == elevationM)&&(identical(other.okFlood, okFlood) || other.okFlood == okFlood)&&(identical(other.okLandslide, okLandslide) || other.okLandslide == okLandslide)&&(identical(other.okStormSurge, okStormSurge) || other.okStormSurge == okStormSurge)&&(identical(other.okEarthquake, okEarthquake) || other.okEarthquake == okEarthquake)&&(identical(other.okTsunami, okTsunami) || other.okTsunami == okTsunami)&&(identical(other.okFire, okFire) || other.okFire == okFire)&&(identical(other.okInlandFlood, okInlandFlood) || other.okInlandFlood == okInlandFlood)&&(identical(other.okVolcano, okVolcano) || other.okVolcano == okVolcano)&&(identical(other.isAllHazard, isAllHazard) || other.isAllHazard == isAllHazard)&&(identical(other.placeClass, placeClass) || other.placeClass == placeClass)&&(identical(other.usableFloorHeightM, usableFloorHeightM) || other.usableFloorHeightM == usableFloorHeightM)&&(identical(other.isShelter, isShelter) || other.isShelter == isShelter)&&(identical(other.barrierFree, barrierFree) || other.barrierFree == barrierFree)&&(identical(other.capacity, capacity) || other.capacity == capacity)&&(identical(other.nearestNodeId, nearestNodeId) || other.nearestNodeId == nearestNodeId)&&(identical(other.note, note) || other.note == note));
 }
 
 
 @override
-int get hashCode => Object.hashAll([runtimeType,id,name,lat,lng,elevationM,okFlood,okLandslide,okStormSurge,okEarthquake,okTsunami,okFire,okInlandFlood,okVolcano,isAllHazard,placeClass,usableFloorHeightM,isShelter,barrierFree,capacity,note]);
+int get hashCode => Object.hashAll([runtimeType,id,name,lat,lng,elevationM,okFlood,okLandslide,okStormSurge,okEarthquake,okTsunami,okFire,okInlandFlood,okVolcano,isAllHazard,placeClass,usableFloorHeightM,isShelter,barrierFree,capacity,nearestNodeId,note]);
 
 @override
 String toString() {
-  return 'Shelter(id: $id, name: $name, lat: $lat, lng: $lng, elevationM: $elevationM, okFlood: $okFlood, okLandslide: $okLandslide, okStormSurge: $okStormSurge, okEarthquake: $okEarthquake, okTsunami: $okTsunami, okFire: $okFire, okInlandFlood: $okInlandFlood, okVolcano: $okVolcano, isAllHazard: $isAllHazard, placeClass: $placeClass, usableFloorHeightM: $usableFloorHeightM, isShelter: $isShelter, barrierFree: $barrierFree, capacity: $capacity, note: $note)';
+  return 'Shelter(id: $id, name: $name, lat: $lat, lng: $lng, elevationM: $elevationM, okFlood: $okFlood, okLandslide: $okLandslide, okStormSurge: $okStormSurge, okEarthquake: $okEarthquake, okTsunami: $okTsunami, okFire: $okFire, okInlandFlood: $okInlandFlood, okVolcano: $okVolcano, isAllHazard: $isAllHazard, placeClass: $placeClass, usableFloorHeightM: $usableFloorHeightM, isShelter: $isShelter, barrierFree: $barrierFree, capacity: $capacity, nearestNodeId: $nearestNodeId, note: $note)';
 }
 
 
@@ -279,7 +283,7 @@ abstract mixin class _$ShelterCopyWith<$Res> implements $ShelterCopyWith<$Res> {
   factory _$ShelterCopyWith(_Shelter value, $Res Function(_Shelter) _then) = __$ShelterCopyWithImpl;
 @override @useResult
 $Res call({
- String id, String name, double lat, double lng, double? elevationM, bool okFlood, bool okLandslide, bool okStormSurge, bool okEarthquake, bool okTsunami, bool okFire, bool okInlandFlood, bool okVolcano, bool isAllHazard, PlaceClass placeClass, double? usableFloorHeightM, bool isShelter, bool barrierFree, int? capacity, String? note
+ String id, String name, double lat, double lng, double? elevationM, bool okFlood, bool okLandslide, bool okStormSurge, bool okEarthquake, bool okTsunami, bool okFire, bool okInlandFlood, bool okVolcano, bool isAllHazard, PlaceClass placeClass, double? usableFloorHeightM, bool isShelter, bool barrierFree, int? capacity, int? nearestNodeId, String? note
 });
 
 
@@ -296,7 +300,7 @@ class __$ShelterCopyWithImpl<$Res>
 
 /// Create a copy of Shelter
 /// with the given fields replaced by the non-null parameter values.
-@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? lat = null,Object? lng = null,Object? elevationM = freezed,Object? okFlood = null,Object? okLandslide = null,Object? okStormSurge = null,Object? okEarthquake = null,Object? okTsunami = null,Object? okFire = null,Object? okInlandFlood = null,Object? okVolcano = null,Object? isAllHazard = null,Object? placeClass = null,Object? usableFloorHeightM = freezed,Object? isShelter = null,Object? barrierFree = null,Object? capacity = freezed,Object? note = freezed,}) {
+@override @pragma('vm:prefer-inline') $Res call({Object? id = null,Object? name = null,Object? lat = null,Object? lng = null,Object? elevationM = freezed,Object? okFlood = null,Object? okLandslide = null,Object? okStormSurge = null,Object? okEarthquake = null,Object? okTsunami = null,Object? okFire = null,Object? okInlandFlood = null,Object? okVolcano = null,Object? isAllHazard = null,Object? placeClass = null,Object? usableFloorHeightM = freezed,Object? isShelter = null,Object? barrierFree = null,Object? capacity = freezed,Object? nearestNodeId = freezed,Object? note = freezed,}) {
   return _then(_Shelter(
 id: null == id ? _self.id : id // ignore: cast_nullable_to_non_nullable
 as String,name: null == name ? _self.name : name // ignore: cast_nullable_to_non_nullable
@@ -317,6 +321,7 @@ as PlaceClass,usableFloorHeightM: freezed == usableFloorHeightM ? _self.usableFl
 as double?,isShelter: null == isShelter ? _self.isShelter : isShelter // ignore: cast_nullable_to_non_nullable
 as bool,barrierFree: null == barrierFree ? _self.barrierFree : barrierFree // ignore: cast_nullable_to_non_nullable
 as bool,capacity: freezed == capacity ? _self.capacity : capacity // ignore: cast_nullable_to_non_nullable
+as int?,nearestNodeId: freezed == nearestNodeId ? _self.nearestNodeId : nearestNodeId // ignore: cast_nullable_to_non_nullable
 as int?,note: freezed == note ? _self.note : note // ignore: cast_nullable_to_non_nullable
 as String?,
   ));
