@@ -38,17 +38,36 @@ def hazard_url(dataset: str, series: str, pref_code: str) -> str:
     return f"{NLFTP_BASE}/{dataset}/{series}/{series}_{pref_code}_GML.zip"
 
 
-# 洪水・土砂・高潮は 4 県共通のシリーズ
+# 洪水・土砂は 4 県共通のシリーズ（3-tuple: dataset, series, label）
 HAZARD_SERIES = {
     "flood": ("A31", "A31-12", "国土数値情報 洪水浸水想定区域データ（2012）"),
     "landslide": ("A33", "A33-18", "国土数値情報 土砂災害警戒区域データ（2018）"),
-    "storm_surge": ("A38", "A38-14", "国土数値情報 高潮浸水想定区域データ（2014）"),
 }
 
-# 津波は県によって提供シリーズが異なる。東京・埼玉は国土数値情報に未提供
+# 高潮（A49）は県ごとにシリーズ年度が異なる。region キー → (dataset, series, label)。
+# 埼玉は内陸で提供無し（欠落は上位で許容）。
+STORM_SURGE_SERIES = {
+    "chiba": ("A49", "A49-20", "国土数値情報 高潮浸水想定区域データ（2020）"),
+    "tokyo": ("A49", "A49-20", "国土数値情報 高潮浸水想定区域データ（2020）"),
+    "kanagawa": ("A49", "A49-22", "国土数値情報 高潮浸水想定区域データ（2022）"),
+}
+
+# 津波は県によって提供シリーズが異なる。東京・埼玉は国土数値情報に未提供。
 TSUNAMI_SERIES = {
     "chiba": ("A40", "A40-18", "国土数値情報 津波浸水想定データ（2018）"),
     "kanagawa": ("A40", "A40-16", "国土数値情報 津波浸水想定データ（2016）"),
 }
 
+# 各県で「hazard_grid の該当種別が 0 セルでも合格」を許容するハザード種別
+# volcano: v1 パイプラインでは火山 GML を未取込（全県 0 埋め）
+ALLOWED_MISSING_HAZARDS: dict[str, tuple[str, ...]] = {
+    "saitama": ("storm_surge", "tsunami", "volcano"),
+    "tokyo": ("tsunami", "volcano"),
+    "chiba": ("volcano",),
+    "kanagawa": ("volcano",),
+}
+
 ELEVATION_SOURCE = "国土地理院 標高タイル（DEM PNG）"
+
+# DEM 標高タイルのプリフライト用エンドポイント（東京駅周辺 z14 タイル）
+DEM_PREFLIGHT_URL = "https://cyberjapandata.gsi.go.jp/xyz/dem_png/14/14552/6451.png"

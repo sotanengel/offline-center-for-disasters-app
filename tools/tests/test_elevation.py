@@ -71,3 +71,53 @@ def test_elevation_caches_tiles(tmp_path):
     provider.elevation_at(35.681, 139.767)
     provider.elevation_at(35.682, 139.768)  # 同タイル内
     assert len(calls) == 1
+
+
+def test_fetch_failure_tracked_not_swallowed(tmp_path):
+    """タイル取得失敗は握り潰さず、失敗カウンタと成功カウンタで観測できること。
+
+    現状の実装は Exception を全て呑んで None を返し、キャッシュにも書かず、
+    ログにも残さないので、全ノードが NULL 標高になっても検知できなかった（P0）。
+    """
+    def fetcher(z, x, y):
+        raise RuntimeError("simulated network failure")
+
+    provider = ElevationProvider(cache_dir=tmp_path / "dem", fetcher=fetcher)
+    assert provider.elevation_at(35.681, 139.767) is None
+    assert provider.elevation_at(35.700, 139.800) is None
+    assert provider.failure_count >= 2
+    assert provider.success_count == 0
+
+
+def test_fetch_success_tracked_and_cached(tmp_path):
+    elevations = np.full((256, 256), 5.5)
+    png = _make_dem_png(elevations)
+    provider = ElevationProvider(
+        cache_dir=tmp_path / "dem", fetcher=lambda z, x, y: png
+    )
+    provider.elevation_at(35.681, 139.767)
+    assert provider.success_count == 1
+    assert provider.failure_count == 0
+    # キャッシュへ書き出されている（後続の別プロセスからも読める）
+    cached = list((tmp_path / "dem").glob("*.png"))
+    assert len(cached) == 1
+
+
+def test_failure_rate_helper(tmp_path):
+    """成功と失敗が混在する場合の失敗率が正しく計算できる。"""
+    elevations = np.full((256, 256), 3.0)
+    png = _make_dem_png(elevations)
+    call = {"n": 0}
+
+    def flaky(z, x, y):
+        call["n"] += 1
+        if call["n"] % 2 == 0:
+            raise RuntimeError("boom")
+        return png
+
+    provider = ElevationProvider(cache_dir=tmp_path / "dem", fetcher=flaky)
+    for i in range(6):
+        provider.elevation_at(35.6 + i * 0.05, 139.7 + i * 0.05)
+    # 6 タイル取得（別タイル毎）。3 成功 / 3 失敗を想定
+    assert provider.success_count + provider.failure_count == 6
+    assert 0.0 < provider.failure_rate < 1.0
