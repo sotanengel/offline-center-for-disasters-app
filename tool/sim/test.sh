@@ -13,7 +13,7 @@ cd "${ROOT}"
 
 run_unit_tests() {
   sim_log_info "test" "phase=unit"
-  if flutter test; then
+  if flutter test --exclude-tags real_llm; then
     sim_log_info "test" "phase=unit result=pass"
     return 0
   fi
@@ -37,6 +37,8 @@ run_integration_tests() {
 
   tool/sim/grant_permissions.sh "${device_udid}" || true
 
+  tool/sim/bootstrap_leap_sdk.sh
+
   sim_log_info "test" "phase=integration prebuild app+pack"
   flutter build ios --simulator --debug >/dev/null
   xcrun simctl install "${device_udid}" "${ROOT}/build/ios/iphonesimulator/Runner.app"
@@ -44,7 +46,7 @@ run_integration_tests() {
 
   sim_watchdog_start "${device_udid}"
   local flutter_exit=0
-  flutter test integration_test -d "${device_udid}" 2>&1 | tee "${flutter_log}" || flutter_exit=$?
+  flutter test integration_test -d "${device_udid}" --exclude-tags real_llm 2>&1 | tee "${flutter_log}" || flutter_exit=$?
   sim_watchdog_stop
 
   local category
@@ -91,4 +93,5 @@ if ! run_integration_tests "${DEVICE_UDID}"; then
 fi
 
 sim_log_info "test" "all phases passed"
+# LFM2.5 実推論テスト: tool/sim/test_llm.sh（@Tags real_llm、モデル DL 必要）
 exit "${SIM_EXIT_OK}"

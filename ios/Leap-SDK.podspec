@@ -19,4 +19,12 @@ Pod::Spec.new do |spec|
   spec.dependency 'Inference-Engine-Executorch-Backend', '0.9.4'
   spec.dependency 'Inference-Engine-LlamaCpp-Backend', '0.9.4'
   spec.dependency 'Leap-Model-Downloader', '0.9.4'
+  spec.prepare_command = <<-CMD
+    if [ ! -d "LeapSDK.xcframework" ]; then
+      curl -fsSL -o LeapSDK.xcframework.zip \
+        "https://github.com/Liquid4All/leap-ios/releases/download/v0.9.4/LeapSDK.xcframework.zip"
+      unzip -qo LeapSDK.xcframework.zip
+      rm -f LeapSDK.xcframework.zip
+    fi
+  CMD
 end
