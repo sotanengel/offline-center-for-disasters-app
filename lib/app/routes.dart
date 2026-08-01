@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import '../domain/entities/enums.dart';
 import '../ui/guide/guide_degrade_screen.dart';
 import '../ui/guide/guide_detail_screen.dart';
+import '../ui/onboarding/onboarding_screen.dart';
+import '../ui/settings/settings_screen.dart';
 import '../ui/home/home_screen.dart';
 import '../domain/entities/guide_card.dart';
 
@@ -66,12 +68,12 @@ Route<Object?>? onGenerateAppRoute(RouteSettings settings) {
     case AppRoutes.settings:
       return MaterialPageRoute(
         settings: settings,
-        builder: (_) => const _PlaceholderScreen(routeName: '設定 (S-05)'),
+        builder: (_) => const SettingsScreen(),
       );
     case AppRoutes.onboarding:
       return MaterialPageRoute(
         settings: settings,
-        builder: (_) => const _PlaceholderScreen(routeName: '初回セットアップ (S-06)'),
+        builder: (_) => const OnboardingScreen(),
       );
     default:
       return null;

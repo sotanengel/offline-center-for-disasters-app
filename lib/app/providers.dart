@@ -22,7 +22,10 @@ import '../domain/policies/destination_policy.dart';
 import '../domain/policies/evacuation_mode_judge.dart';
 import '../domain/policies/hazard_prior_scorer.dart';
 import '../domain/services/hazard_prior.dart';
+import '../data/llm/leap_stub_engine.dart';
+import '../data/llm/llm_engine.dart';
 import '../data/guidance/kb_guidance_service.dart';
+import '../data/pack/pack_source.dart';
 import '../domain/services/guidance_service.dart';
 import '../domain/services/route_engine.dart';
 import '../data/rule/rule_situation_analyzer.dart';
@@ -213,6 +216,53 @@ final guidanceServiceProvider = Provider<GuidanceService>(
 final situationAnalyzerProvider = Provider<SituationAnalyzer>(
   (ref) => RuleSituationAnalyzerLoader(),
 );
+
+/// §7 LEAP スタブエンジン（P5 で差し替え）。
+final llmEngineProvider = Provider<LlmEngine>((ref) => LeapStubEngine());
+
+/// LLM モデル選択の永続化（PR-10 / F-11）。
+final llmModelChoiceProvider = StateProvider<LlmModelChoice>((ref) {
+  final prefs = ref.watch(sharedPreferencesProvider);
+  final raw = prefs.getString('llm_model_choice');
+  if (raw == null) return LlmModelChoice.auto;
+  return LlmModelChoice.values.firstWhere(
+    (e) => e.name == raw,
+    orElse: () => LlmModelChoice.auto,
+  );
+});
+
+/// 初回セットアップ完了フラグ。
+final onboardingCompleteProvider =
+    AsyncNotifierProvider<OnboardingCompleteNotifier, bool>(
+      OnboardingCompleteNotifier.new,
+    );
+
+class OnboardingCompleteNotifier extends AsyncNotifier<bool> {
+  static const _key = 'onboarding_complete';
+
+  @override
+  Future<bool> build() async {
+    return ref.watch(sharedPreferencesProvider).getBool(_key) ?? false;
+  }
+
+  Future<void> setComplete(bool value) async {
+    await ref.read(sharedPreferencesProvider).setBool(_key, value);
+    state = AsyncData(value);
+  }
+}
+
+/// 導入済みパック一覧（初版: ローカル列挙）。
+final packSourceProvider = Provider<PackSource>(
+  (ref) => LocalPackSource({'tokyo'}),
+);
+
+final installedRegionsProvider = FutureProvider<List<String>>((ref) async {
+  final r = await ref.watch(packSourceProvider).listInstalledRegions();
+  return switch (r) {
+    Ok(value: final v) => v,
+    Err() => const [],
+  };
+});
 
 // ---------------------------------------------------------------------------
 // 内部ヘルパ
