@@ -68,7 +68,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // 1 タップ後に結果画面が出ていること
-    expect(find.text('結果サマリ (S-02)'), findsOneWidget);
+    expect(find.text('案内を開始する'), findsOneWidget);
   });
 
   testWidgets('§20.2 リグレッション: ホームには destination_summary が存在しない', (
