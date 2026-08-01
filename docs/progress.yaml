@@ -247,6 +247,13 @@ features:
     pr: [18]
     notes: >-
       PR-17 で初回セットアップ起動と位置情報 requestPermission を接続。
+  - id: F-UI-01
+    title: ホームUI簡素化（揺れバナー・自由記述・緊急導線・unknownタイル・TTSトグル削除）
+    spec_ref: "§3.2"
+    phase: P2
+    status: in_progress
+    notes: >-
+      LLM 基盤（data/llm, providers, 設定画面）は維持。UI からの入口のみ削除。
 
 # 地域データパック生成状況（Issue #8 で再生成完了 2026-08-01）
 data_packs:

@@ -43,7 +43,7 @@ void main() {
     await pumpAppUntilHomeReady(tester);
     expect(find.text('どの災害から逃げますか？'), findsOneWidget);
     expect(find.byKey(const Key('tile_tsunami')), findsOneWidget);
-    expect(find.text('わからない・とにかく逃げたい'), findsOneWidget);
+    expect(find.text('わからない・とにかく逃げたい'), findsNothing);
   });
 
   testWidgets('津波タイル 1 タップ → S-02 → S-03（§20.5）', (tester) async {

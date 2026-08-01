@@ -6,13 +6,17 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:offline_center_for_disasters/app/providers.dart';
+import 'package:offline_center_for_disasters/core/result/result.dart';
 import 'package:offline_center_for_disasters/data/llm/ai_situation_analyzer.dart';
 import 'package:offline_center_for_disasters/data/llm/composite_situation_analyzer.dart';
 import 'package:offline_center_for_disasters/data/llm/llm_errors.dart';
 import 'package:offline_center_for_disasters/data/rule/rule_situation_analyzer.dart';
-import 'package:offline_center_for_disasters/main.dart' as app;
+import 'package:offline_center_for_disasters/domain/entities/situation_slots.dart';
+import 'package:offline_center_for_disasters/domain/services/situation_analyzer.dart';
+import 'package:offline_center_for_disasters/ui/result/result_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../test/helpers/destination_plan_overrides.dart';
 import '../test/helpers/real_llm_assertions.dart';
 import '../test/helpers/real_llm_harness.dart';
 
@@ -74,14 +78,14 @@ void main() {
     await runLeapLlmEngineSmokeTests(harness!.engine);
   });
 
-  testWidgets('自由文 → LFM2.5 実推論 → 津波スロットが結果画面に反映', (tester) async {
+  testWidgets('LFM2.5 実推論 → 津波スロットが結果画面に反映', (tester) async {
     if (skipReason != null || harness == null) {
       // ignore: avoid_print
       print('SKIP: ${skipReason ?? 'harness null'}');
       return;
     }
 
-    SharedPreferences.setMockInitialValues({'onboarding_complete': true});
+    SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     final engine = harness!.engine;
     final analyzer = CompositeSituationAnalyzer(
@@ -89,35 +93,23 @@ void main() {
       rule: await RuleSituationAnalyzer.create(),
     );
 
+    final result = await analyzer.analyze('津波が来る');
+    expect(result, isA<Ok<SituationSlots, SituationAnalyzerError>>());
+
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
           sharedPreferencesProvider.overrideWithValue(prefs),
           llmEngineProvider.overrideWithValue(engine),
           situationAnalyzerProvider.overrideWithValue(analyzer),
+          destinationPlanProviderOverride(),
         ],
-        child: const app.OfflineCenterApp(),
+        child: MaterialApp(home: ResultScreen(slots: (result as Ok).value)),
       ),
     );
-    await tester.pumpAndSettle();
-
-    await tester.enterText(find.byKey(const Key('free_text_input')), '津波が来る');
-    await tester.ensureVisible(
-      find.byKey(const Key('analyze_free_text_button')),
-    );
-    await tester.pumpAndSettle();
-    await tester.tap(find.byKey(const Key('analyze_free_text_button')));
-
-    final deadline = DateTime.now().add(const Duration(seconds: 90));
-    while (DateTime.now().isBefore(deadline)) {
-      await tester.pump(const Duration(milliseconds: 200));
-      if (find.textContaining('津波').evaluate().length >= 2) break;
-      if (find.byKey(const Key('destination_summary')).evaluate().isNotEmpty) {
-        break;
-      }
-    }
     await tester.pumpAndSettle(const Duration(seconds: 2));
 
     expect(find.textContaining('津波'), findsWidgets);
+    expect(find.byKey(const Key('destination_summary')), findsOneWidget);
   });
 }

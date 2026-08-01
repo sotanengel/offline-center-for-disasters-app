@@ -34,7 +34,6 @@ class NavScreen extends ConsumerStatefulWidget {
 }
 
 class _NavScreenState extends ConsumerState<NavScreen> {
-  bool _ttsOn = true;
   final _mapController = MapController();
   RoadGraph? _roadGraph;
   var _cameraFitted = false;
@@ -111,15 +110,7 @@ class _NavScreenState extends ConsumerState<NavScreen> {
         : roadGraphToPolylines(_roadGraph!);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('経路案内'),
-        actions: [
-          IconButton(
-            icon: Icon(_ttsOn ? Icons.volume_up : Icons.volume_off),
-            onPressed: () => setState(() => _ttsOn = !_ttsOn),
-          ),
-        ],
-      ),
+      appBar: AppBar(title: const Text('経路案内')),
       body: Column(
         children: [
           SizedBox(
