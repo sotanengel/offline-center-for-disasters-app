@@ -48,7 +48,9 @@ tool/sim/record.sh stop
 
 # 実機へアプリ + データパックを配置（USB 接続・Developer Mode 必須）
 flutter build ios --release && flutter install -d <UDID> --release
-tool/device/install_pack.sh tokyo <UDID>
+tool/device/list_packs.sh                    # 生成済みパック一覧（関東4県）
+tool/device/install_pack.sh tokyo <UDID>     # 1県のみ
+tool/device/install_all_packs.sh <UDID>      # 4県一括（約1.6GB）
 ```
 
 ## iPhone 動作テストの流れ（AI エージェント用）
