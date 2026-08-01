@@ -23,6 +23,8 @@ import '../domain/policies/evacuation_mode_judge.dart';
 import '../domain/policies/hazard_prior_scorer.dart';
 import '../domain/services/hazard_prior.dart';
 import '../domain/services/route_engine.dart';
+import '../data/rule/rule_situation_analyzer.dart';
+import '../domain/services/situation_analyzer.dart';
 
 /// main() で実インスタンスをオーバーライドする。
 final sharedPreferencesProvider = Provider<SharedPreferences>(
@@ -199,6 +201,11 @@ final offlineSttAvailableProvider = FutureProvider<bool>((ref) async {
 
 /// L2 自由文 (確定は結果画面・PR-7/PR-9 で使用)。
 final freeTextProvider = StateProvider<String>((ref) => '');
+
+/// §8.3 ルールベース SituationAnalyzer（PR-9 / F-02）。
+final situationAnalyzerProvider = Provider<SituationAnalyzer>(
+  (ref) => RuleSituationAnalyzerLoader(),
+);
 
 // ---------------------------------------------------------------------------
 // 内部ヘルパ
