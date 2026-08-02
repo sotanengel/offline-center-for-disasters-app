@@ -24,13 +24,6 @@
   ],
   "sources": [
     {
-      "id": "fdma_oukyu",
-      "title": "消防庁 応急手当WEB講習 コンテンツ概要",
-      "url": "https://www.fdma.go.jp/relocation/kyukyukikaku/oukyu/img/manual.pdf",
-      "category": "first_aid",
-      "publisher": "消防庁"
-    },
-    {
       "id": "tfd_first_aid",
       "title": "東京消防庁「命を救う応急手当」",
       "url": "https://www.tfd.metro.tokyo.lg.jp/content/000035496.pdf",

@@ -17,7 +17,7 @@ void main() {
       sourcesJson: jsonDecode(sourcesRaw) as Map<String, dynamic>,
     );
     expect(bundle.chunks.length, greaterThanOrEqualTo(50));
-    expect(bundle.sources.length, 8);
+    expect(bundle.sources.length, 7);
     expect(bundle.categories.length, 5);
     expect(bundle.chunks.first.content.isNotEmpty, isTrue);
   });

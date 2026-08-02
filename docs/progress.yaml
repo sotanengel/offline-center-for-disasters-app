@@ -279,7 +279,7 @@ features:
     phase: P7
     status: in_progress
     notes: >-
-      tools/kbgen で7資料→119 chunks。AI-7 検索必須 RAG。
+      手作り KB（7資料→75 chunks）。AI-7 検索必須 RAG。
       AppShell 2タブ（ホーム/アシスタント）。
   - id: F-BUG-01
     title: 起動時の赤表示バグ修正（直近選択クリア・タイル強調除去）

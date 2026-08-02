@@ -19,11 +19,11 @@ void main() {
 
   test('parseAnswer は citedChunkIds を必須とする', () {
     const raw =
-        '{"answer":"直接圧迫を行ってください。","citedChunkIds":["fdma_oukyu_001"],"confidence":"high"}';
+        '{"answer":"直接圧迫を行ってください。","citedChunkIds":["tokyo_tips_002"],"confidence":"high"}';
     final result = parser.parseAnswer(raw);
     expect(result, isA<Ok<AssistantAnswer, LlmError>>());
     expect((result as Ok<AssistantAnswer, LlmError>).value.citedChunkIds, [
-      'fdma_oukyu_001',
+      'tokyo_tips_002',
     ]);
   });
 }
