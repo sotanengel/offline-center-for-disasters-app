@@ -4,7 +4,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../app/providers.dart';
 import '../../domain/entities/disaster_candidate.dart';
 import '../../domain/entities/enums.dart';
-import '../../domain/entities/hazard_context.dart';
 import '../../domain/entities/situation_slots.dart';
 import 'disaster_tile.dart';
 
@@ -30,16 +29,14 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final candidates = ref.watch(disasterCandidatesProvider).value ?? const [];
-    final ctx = ref.watch(hazardContextProvider).value ?? const HazardContext();
-    final shakeDetected = ref.watch(shakeDetectedProvider).value ?? false;
     final recent = ref.watch(recentSelectionProvider).value;
 
-    final tiles = _orderedTiles(candidates, ctx, shakeDetected);
-    final emphasized = _emphasizedTypes(candidates, ctx, shakeDetected);
+    final tiles = candidates.map((c) => c.type).toList();
     final oneTap = _oneTapType(candidates);
 
     Future<void> select(DisasterType type) async {
-      ref.read(recentSelectionStoreProvider).save(type);
+      await ref.read(recentSelectionStoreProvider).save(type);
+      ref.invalidate(recentSelectionProvider);
       final slots = SituationSlots(disasterType: type, source: SlotSource.tile);
       onSelect?.call(slots);
     }
@@ -67,7 +64,6 @@ class HomeScreen extends ConsumerWidget {
                     key: Key('tile_${type.name}'),
                     emoji: _tileMeta[type]!.$1,
                     label: _tileMeta[type]!.$2,
-                    emphasized: emphasized.contains(type),
                     onTap: () => select(type),
                   ),
               ],
@@ -76,38 +72,6 @@ class HomeScreen extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  List<DisasterType> _orderedTiles(
-    List<DisasterCandidate> candidates,
-    HazardContext ctx,
-    bool shakeDetected,
-  ) {
-    final ordered = candidates.map((c) => c.type).toList();
-    if (shakeDetected &&
-        ctx.inTsunamiZone &&
-        ordered.contains(DisasterType.tsunami)) {
-      ordered
-        ..remove(DisasterType.tsunami)
-        ..insert(0, DisasterType.tsunami);
-    }
-    return ordered;
-  }
-
-  Set<DisasterType> _emphasizedTypes(
-    List<DisasterCandidate> candidates,
-    HazardContext ctx,
-    bool shakeDetected,
-  ) {
-    final emphasized = {
-      for (final c in candidates)
-        if (c.score >= 70) c.type,
-    };
-    if (shakeDetected) {
-      emphasized.add(DisasterType.earthquake);
-      if (ctx.inTsunamiZone) emphasized.add(DisasterType.tsunami);
-    }
-    return emphasized;
   }
 
   DisasterType? _oneTapType(List<DisasterCandidate> candidates) {

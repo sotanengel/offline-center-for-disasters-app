@@ -273,6 +273,14 @@ features:
     status: in_progress
     notes: >-
       LLM 基盤（data/llm, providers, 設定画面）は維持。UI からの入口のみ削除。
+  - id: F-BUG-01
+    title: 起動時の赤表示バグ修正（直近選択クリア・タイル強調除去）
+    spec_ref: "§3.2, §3.4"
+    phase: P2
+    status: in_progress
+    notes: >-
+      コールド起動時に RecentSelectionStore を clear。ハザードプライアは並び替えのみ。
+      揺れ検知 UI・センサ起動を無効化。
 
 # 地域データパック生成状況（Issue #8 で再生成完了 2026-08-01）
 data_packs:
