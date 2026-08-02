@@ -277,7 +277,8 @@ features:
     title: 起動時の赤表示バグ修正（直近選択クリア・タイル強調除去）
     spec_ref: "§3.2, §3.4"
     phase: P2
-    status: in_progress
+    status: done
+    pr: 33
     notes: >-
       コールド起動時に RecentSelectionStore を clear。ハザードプライアは並び替えのみ。
       揺れ検知 UI・センサ起動・§3.5 ワンタップボタンを無効化。
