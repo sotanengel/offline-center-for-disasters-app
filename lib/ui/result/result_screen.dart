@@ -244,7 +244,9 @@ class _DestinationSummary extends StatelessWidget {
         child: ListTile(
           title: Text('データパック未配置'),
           subtitle: Text(
-            'tool/device/install_all_packs.sh（実機）または tool/sim/install_pack.sh（シミュレータ）で地域パックを配置してください',
+            'オフラインデータパック（bundled）が未配置です。'
+            'リリースビルド（tool/build/release_ios.sh）または'
+            ' tool/build/prepare_bundled_packs.sh でデータを配置してください',
           ),
         ),
       );

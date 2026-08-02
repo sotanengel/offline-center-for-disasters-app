@@ -11,13 +11,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../core/geo/geo_point.dart';
 import '../core/result/result.dart';
 import '../data/location/location_service.dart';
+import '../data/pack/bundled_pack_installer.dart';
 import '../data/pack/evacuation_pack.dart';
 import '../data/pack/multi_region_pack.dart';
 import '../data/pack/pack_catalog.dart';
 import '../data/pack/pack_hazard_prior.dart';
 import '../data/pack/pack_loader.dart';
 import '../data/pack/region_pack_info.dart';
-import '../data/pack/region_selector.dart';
 import '../data/prefs/recent_selection_store.dart';
 import '../data/routing/graph_route_engine.dart';
 import '../data/sensors/shake_detector.dart';
@@ -149,32 +149,51 @@ final installedPackInfosProvider = FutureProvider<List<RegionPackInfo>>((
   }
 });
 
-/// 現在地周辺（§4.4 / Q10 拡大半径 20km）と交差するパックを開いた [EvacuationPack]。
-/// 未配置 / 破損時は null で縮退する (§12)。
-final dataPackProvider = FutureProvider<EvacuationPack?>((ref) async {
-  final infos = await ref.watch(installedPackInfosProvider.future);
-  if (infos.isEmpty) return null;
-  final loc = await ref.watch(locationProvider.future) ?? kDefaultOrigin;
-  final active = selectActiveRegions(origin: loc, installed: infos);
-  if (active.isEmpty) return null;
+/// 同梱統合パック（bundled）を優先して開く。dev 用に単県のみ導入時は従来マージ。
+Future<EvacuationPack?> _openEvacuationPack(Directory packsRoot) async {
+  final bundledPath = BundledPackInstaller.packPathFor(packsRoot);
+  if (File(bundledPath).existsSync()) {
+    final res = await PackLoader.open(bundledPath);
+    final pack = res.valueOrNull;
+    if (pack != null) return pack;
+  }
 
+  final infos = await PackCatalog.scan(packsRoot);
+  if (infos.isEmpty) return null;
+
+  // dev: 単県パックのみ手動配置時
+  final devPacks = infos.where(
+    (i) => i.regionKey != BundledPackInstaller.bundledPackKey,
+  );
   final opened = <DataPack>[];
-  for (final info in active) {
+  for (final info in devPacks) {
     final res = await PackLoader.open(info.path);
     final pack = res.valueOrNull;
     if (pack != null) opened.add(pack);
   }
   if (opened.isEmpty) return null;
+  if (opened.length == 1) return opened.single;
+  return MultiRegionPack(opened);
+}
 
-  final multi = MultiRegionPack(opened);
-  ref.onDispose(multi.close);
-  return multi;
+/// 導入済みの同梱統合パック（または dev 用マルチパック）。
+/// 未配置 / 破損時は null で縮退する (§12)。
+final dataPackProvider = FutureProvider<EvacuationPack?>((ref) async {
+  try {
+    final root = await ref.watch(packsRootProvider.future);
+    final pack = await _openEvacuationPack(root);
+    if (pack == null) return null;
+    ref.onDispose(pack.close);
+    return pack;
+  } catch (_) {
+    return null;
+  }
 });
 
 /// 互換: 旧テストが単一パスを差し込む用。未使用時は dataPackProvider に委譲。
 final packPathProvider = FutureProvider<String>((ref) async {
   final root = await ref.watch(packsRootProvider.future);
-  return p.join(root.path, 'tokyo', 'pack.sqlite');
+  return BundledPackInstaller.packPathFor(root);
 });
 
 // ---------------------------------------------------------------------------
