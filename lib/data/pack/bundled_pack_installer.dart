@@ -3,20 +3,31 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:path/path.dart' as p;
 
-/// アプリ同梱（assets/packs）の地域パックを Application Support へ展開する。
+/// アプリ同梱（assets/packs）の統合パックを Application Support へ展開する。
 ///
-/// 初回起動時のみコピーし、既に [packsRoot]/[region]/pack.sqlite がある場合は
+/// 初回起動時のみコピーし、既に [packsRoot]/bundled/pack.sqlite がある場合は
 /// スキップする（§12: 同梱 / ローカル）。
 class BundledPackInstaller {
   BundledPackInstaller._();
 
-  /// 同梱対象の region キー（build 時に assets/packs/ へ配置される）。
-  static const bundledRegions = ['tokyo'];
+  /// 同梱統合パックの region キー（都道府県名ではない）。
+  static const bundledPackKey = 'bundled';
+
+  /// 同梱対象（build 時に assets/packs/bundled/ へ配置）。
+  static const bundledRegions = [bundledPackKey];
+
+  /// 旧バージョンで同梱・導入していたキー（マイグレーション用）。
+  static const legacyBundledRegions = ['tokyo', 'kanto'];
 
   static String assetPathFor(String regionKey) =>
       'assets/packs/$regionKey/pack.sqlite';
 
+  static String packPathFor(Directory packsRoot, [String? regionKey]) =>
+      p.join(packsRoot.path, regionKey ?? bundledPackKey, 'pack.sqlite');
+
   /// 同梱パックを [packsRoot] へ展開する。asset 不在時は静かにスキップ。
+  ///
+  /// 旧単県パックのみ導入済みの端末は、統合 bundled 導入後に legacy を削除する。
   static Future<void> ensureInstalled(
     Directory packsRoot, {
     AssetBundle? bundle,
@@ -25,8 +36,11 @@ class BundledPackInstaller {
     await packsRoot.create(recursive: true);
 
     for (final region in bundledRegions) {
-      final destFile = File(p.join(packsRoot.path, region, 'pack.sqlite'));
-      if (await destFile.exists()) continue;
+      final destFile = File(packPathFor(packsRoot, region));
+      if (await destFile.exists()) {
+        await _removeLegacyPacksIfNeeded(packsRoot);
+        continue;
+      }
 
       final assetPath = assetPathFor(region);
       ByteData data;
@@ -41,6 +55,16 @@ class BundledPackInstaller {
         data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes),
         flush: true,
       );
+      await _removeLegacyPacksIfNeeded(packsRoot);
+    }
+  }
+
+  static Future<void> _removeLegacyPacksIfNeeded(Directory packsRoot) async {
+    for (final legacy in legacyBundledRegions) {
+      final legacyDir = Directory(p.join(packsRoot.path, legacy));
+      if (await legacyDir.exists()) {
+        await legacyDir.delete(recursive: true);
+      }
     }
   }
 }

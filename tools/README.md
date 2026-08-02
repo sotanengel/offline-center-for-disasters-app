@@ -24,6 +24,21 @@ uv run python -m packgen.build_pack --all
 
 生成物: `tools/out/<region>/pack.sqlite`（スキーマは要件定義書 §14 準拠）
 
+## 同梱用統合パック（bundled）
+
+県別生成後、リリースビルド時に 1 ファイルへマージします（アプリ実行時は都道府県を意識しない）。
+
+```bash
+cd tools
+uv run python -m packgen.merge_pack
+# 出力: tools/out/bundled/pack.sqlite（metadata.merged_from に含まれる県を記録）
+
+# アプリ assets へ配置（4県 out が前提）
+tool/build/prepare_bundled_packs.sh
+```
+
+`--region` でマージ対象県を指定可能（将来の県追加時は `packgen.config.REGIONS` に追加して merge）。
+
 ## 検証
 
 ```bash

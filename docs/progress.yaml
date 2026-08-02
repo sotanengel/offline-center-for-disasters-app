@@ -8,7 +8,7 @@ meta:
   spec_source: オフライン災害対応アプリ_要件定義書.md
   spec_version: "2026-07-31"
   last_updated: "2026-08-02"
-  branch: feature/search-radius-nav-progress
+  branch: feature/bundled-pack-merge
 
 status_enum: [pending, in_progress, done, blocked, out_of_scope]
 
@@ -257,6 +257,14 @@ features:
     pr: [18]
     notes: >-
       PR-17 で初回セットアップ起動と位置情報 requestPermission を接続。
+  - id: F-10-bundled-merge
+    title: 同梱用統合パック（bundled）— 県別生成を merge して初回インストール
+    spec_ref: "§12 / §14"
+    phase: P1
+    status: in_progress
+    notes: >-
+      packgen.merge_pack で config.REGIONS 全県を 1 sqlite に統合。
+      ランタイムは packs/bundled/pack.sqlite のみ（県境 selectActiveRegions 廃止）。
   - id: F-UI-01
     title: ホームUI簡素化（揺れバナー・自由記述・緊急導線・unknownタイル・TTSトグル削除）
     spec_ref: "§3.2"

@@ -40,30 +40,47 @@ void main() {
     if (await root.exists()) await root.delete(recursive: true);
   });
 
-  test('同梱パックを Application Support 相当へコピーする', () async {
+  test('同梱 bundled パックを Application Support 相当へコピーする', () async {
     const payload = [1, 2, 3, 4];
     final bundle = _FakeAssetBundle({
-      BundledPackInstaller.assetPathFor('tokyo'): Uint8List.fromList(payload),
+      BundledPackInstaller.assetPathFor('bundled'): Uint8List.fromList(payload),
     });
 
     await BundledPackInstaller.ensureInstalled(root, bundle: bundle);
 
-    final dest = File(p.join(root.path, 'tokyo', 'pack.sqlite'));
+    final dest = File(BundledPackInstaller.packPathFor(root));
     expect(await dest.exists(), isTrue);
     expect(await dest.readAsBytes(), payload);
   });
 
-  test('既存パックがある場合は上書きしない', () async {
-    final existing = File(p.join(root.path, 'tokyo', 'pack.sqlite'));
+  test('既存 bundled パックがある場合は上書きしない', () async {
+    final existing = File(BundledPackInstaller.packPathFor(root));
     await existing.parent.create(recursive: true);
     await existing.writeAsBytes([9, 9, 9]);
 
     final bundle = _FakeAssetBundle({
-      BundledPackInstaller.assetPathFor('tokyo'): Uint8List.fromList([1]),
+      BundledPackInstaller.assetPathFor('bundled'): Uint8List.fromList([1]),
     });
     await BundledPackInstaller.ensureInstalled(root, bundle: bundle);
 
     expect(await existing.readAsBytes(), [9, 9, 9]);
+  });
+
+  test('bundled 導入後に legacy tokyo / kanto パックを削除する', () async {
+    for (final legacy in ['tokyo', 'kanto']) {
+      final legacyFile = File(p.join(root.path, legacy, 'pack.sqlite'));
+      await legacyFile.parent.create(recursive: true);
+      await legacyFile.writeAsBytes([7]);
+    }
+
+    final bundle = _FakeAssetBundle({
+      BundledPackInstaller.assetPathFor('bundled'): Uint8List.fromList([1, 2]),
+    });
+    await BundledPackInstaller.ensureInstalled(root, bundle: bundle);
+
+    expect(File(BundledPackInstaller.packPathFor(root)).existsSync(), isTrue);
+    expect(Directory(p.join(root.path, 'tokyo')).existsSync(), isFalse);
+    expect(Directory(p.join(root.path, 'kanto')).existsSync(), isFalse);
   });
 
   test('asset 不在時は例外を投げずスキップする', () async {
@@ -71,9 +88,6 @@ void main() {
       root,
       bundle: _FakeAssetBundle(const {}),
     );
-    expect(
-      File(p.join(root.path, 'tokyo', 'pack.sqlite')).existsSync(),
-      isFalse,
-    );
+    expect(File(BundledPackInstaller.packPathFor(root)).existsSync(), isFalse);
   });
 }
