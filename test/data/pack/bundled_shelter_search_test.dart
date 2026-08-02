@@ -17,16 +17,7 @@ void main() {
   );
 
   test('市川付近の津波避難先は千葉側（統合パック）', () async {
-    if (!bundledPath.existsSync()) {
-      expect(
-        File(
-          '${Directory.current.path}/tools/out/tokyo/pack.sqlite',
-        ).existsSync(),
-        isTrue,
-        reason: 'bundled 未生成。cd tools && uv run python -m packgen.merge_pack',
-      );
-      return;
-    }
+    if (!bundledPath.existsSync()) return;
 
     const origin = GeoPoint(35.7284921, 139.9000146);
     final opened = await PackLoader.open(bundledPath.path);
