@@ -112,7 +112,7 @@ void main() {
       );
     });
 
-    testWidgets('スコア ≥ 70 のタイルのみ強調される', (tester) async {
+    testWidgets('スコア ≥ 70 でもタイルは強調されない（並び替えのみ）', (tester) async {
       const ctx = HazardContext(inFloodZone: true, distRiverM: 500);
       await pumpHome(
         tester,
@@ -122,44 +122,44 @@ void main() {
           ...defaultCandidates(ctx).where((c) => c.type != DisasterType.flood),
         ],
       );
-      expect(tileEmphasized(tester, DisasterType.flood), isTrue);
+      expect(tileEmphasized(tester, DisasterType.flood), isFalse);
       expect(tileEmphasized(tester, DisasterType.earthquake), isFalse);
       expect(tileEmphasized(tester, DisasterType.fire), isFalse);
     });
   });
 
-  group('揺れ検知（§3.4-b / §20.2）', () {
-    testWidgets('バナーなし + 地震タイル強調（自動遷移はしない）', (tester) async {
-      await pumpHome(tester, shake: true);
-      expect(find.text('揺れを検知しました'), findsNothing);
-      expect(find.text('津波の危険があります'), findsNothing);
-      expect(tileEmphasized(tester, DisasterType.earthquake), isTrue);
-      // 自動画面遷移しない（MUST NOT）: ホームが表示されたまま
-      expect(find.text('どの災害から逃げますか？'), findsOneWidget);
-    });
-
-    testWidgets('津波想定域内なら津波が最上位 + バナーなし', (tester) async {
+  group('揺れ検知 UI（無効化）', () {
+    testWidgets('揺れ検知でもタイル強調・並び替えは行わない', (tester) async {
       const ctx = HazardContext(inTsunamiZone: true, distCoastM: 800);
-      await pumpHome(tester, ctx: ctx, shake: true);
-      expect(find.text('津波の危険があります'), findsNothing);
+      await pumpHome(
+        tester,
+        ctx: ctx,
+        shake: true,
+        candidates: [
+          cand(DisasterType.earthquake, 30, ctx),
+          cand(DisasterType.fire, 20, ctx),
+          cand(DisasterType.tsunami, 0, ctx),
+          cand(DisasterType.flood, 0, ctx),
+          cand(DisasterType.landslide, 0, ctx),
+          cand(DisasterType.stormSurge, 0, ctx),
+          cand(DisasterType.volcano, 0, ctx),
+        ],
+      );
       expect(find.text('揺れを検知しました'), findsNothing);
-      // スコア 0 でも揺れ検知により津波が最上位
+      expect(find.text('津波の危険があります'), findsNothing);
+      expect(tileEmphasized(tester, DisasterType.earthquake), isFalse);
+      expect(tileEmphasized(tester, DisasterType.tsunami), isFalse);
+      // 揺れ検知による津波最上位化は行わない
       expect(
-        tilePrecedes(tester, DisasterType.tsunami, DisasterType.earthquake),
+        tilePrecedes(tester, DisasterType.earthquake, DisasterType.tsunami),
         isTrue,
       );
-      expect(tileEmphasized(tester, DisasterType.tsunami), isTrue);
-    });
-
-    testWidgets('揺れなしならバナーなし', (tester) async {
-      await pumpHome(tester, shake: false);
-      expect(find.text('揺れを検知しました'), findsNothing);
-      expect(find.text('津波の危険があります'), findsNothing);
+      expect(find.text('どの災害から逃げますか？'), findsOneWidget);
     });
   });
 
-  group('§3.5 種別明示ワンタップボタン', () {
-    testWidgets('単一種別 ≥100 かつ他 ≤30 のとき表示される', (tester) async {
+  group('§3.5 種別明示ワンタップボタン（無効化）', () {
+    testWidgets('単一種別 ≥100 かつ他 ≤30 でも表示しない', (tester) async {
       const ctx = HazardContext(inTsunamiZone: true, distCoastM: 500);
       await pumpHome(
         tester,
@@ -174,24 +174,25 @@ void main() {
           cand(DisasterType.volcano, 0, ctx),
         ],
       );
-      expect(find.text('津波から避難する'), findsOneWidget);
+      expect(find.text('津波から避難する'), findsNothing);
     });
 
-    testWidgets('他に高スコアがある場合は表示しない', (tester) async {
-      const ctx = HazardContext(inTsunamiZone: true, inFloodZone: true);
+    testWidgets('高潮区域でも「高潮から避難する」は表示しない', (tester) async {
+      const ctx = HazardContext(inStormSurgeZone: true);
       await pumpHome(
         tester,
         ctx: ctx,
         candidates: [
-          cand(DisasterType.tsunami, 135, ctx),
-          cand(DisasterType.flood, 100, ctx),
-          ...defaultCandidates(ctx).where(
-            (c) =>
-                c.type != DisasterType.tsunami && c.type != DisasterType.flood,
-          ),
+          cand(DisasterType.stormSurge, 100, ctx),
+          cand(DisasterType.earthquake, 30, ctx),
+          cand(DisasterType.fire, 20, ctx),
+          cand(DisasterType.tsunami, 0, ctx),
+          cand(DisasterType.flood, 0, ctx),
+          cand(DisasterType.landslide, 0, ctx),
+          cand(DisasterType.volcano, 0, ctx),
         ],
       );
-      expect(find.byKey(const Key('one_tap_evacuate')), findsNothing);
+      expect(find.text('高潮から避難する'), findsNothing);
     });
 
     testWidgets('緊急導線は表示されない', (tester) async {

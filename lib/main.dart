@@ -10,10 +10,13 @@ import 'app/providers.dart';
 import 'app/routes.dart';
 import 'app/theme.dart';
 import 'data/pack/bundled_pack_installer.dart';
+import 'data/prefs/recent_selection_store.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   final prefs = await SharedPreferences.getInstance();
+  // F-BUG-01: コールド起動時は前回セッションの直近選択を引き継がない。
+  await RecentSelectionStore(prefs).clear();
   try {
     final supportDir = await getApplicationSupportDirectory();
     await BundledPackInstaller.ensureInstalled(

@@ -2,9 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
-import '../../domain/entities/disaster_candidate.dart';
 import '../../domain/entities/enums.dart';
-import '../../domain/entities/hazard_context.dart';
 import '../../domain/entities/situation_slots.dart';
 import 'disaster_tile.dart';
 
@@ -30,16 +28,13 @@ class HomeScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final candidates = ref.watch(disasterCandidatesProvider).value ?? const [];
-    final ctx = ref.watch(hazardContextProvider).value ?? const HazardContext();
-    final shakeDetected = ref.watch(shakeDetectedProvider).value ?? false;
     final recent = ref.watch(recentSelectionProvider).value;
 
-    final tiles = _orderedTiles(candidates, ctx, shakeDetected);
-    final emphasized = _emphasizedTypes(candidates, ctx, shakeDetected);
-    final oneTap = _oneTapType(candidates);
+    final tiles = candidates.map((c) => c.type).toList();
 
     Future<void> select(DisasterType type) async {
-      ref.read(recentSelectionStoreProvider).save(type);
+      await ref.read(recentSelectionStoreProvider).save(type);
+      ref.invalidate(recentSelectionProvider);
       final slots = SituationSlots(disasterType: type, source: SlotSource.tile);
       onSelect?.call(slots);
     }
@@ -50,8 +45,6 @@ class HomeScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(12),
           children: [
-            if (oneTap != null)
-              _oneTapButton(context, oneTap, () => select(oneTap)),
             if (recent != null) _recentChip(recent, () => select(recent)),
             const SizedBox(height: 8),
             GridView.count(
@@ -67,70 +60,11 @@ class HomeScreen extends ConsumerWidget {
                     key: Key('tile_${type.name}'),
                     emoji: _tileMeta[type]!.$1,
                     label: _tileMeta[type]!.$2,
-                    emphasized: emphasized.contains(type),
                     onTap: () => select(type),
                   ),
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  List<DisasterType> _orderedTiles(
-    List<DisasterCandidate> candidates,
-    HazardContext ctx,
-    bool shakeDetected,
-  ) {
-    final ordered = candidates.map((c) => c.type).toList();
-    if (shakeDetected &&
-        ctx.inTsunamiZone &&
-        ordered.contains(DisasterType.tsunami)) {
-      ordered
-        ..remove(DisasterType.tsunami)
-        ..insert(0, DisasterType.tsunami);
-    }
-    return ordered;
-  }
-
-  Set<DisasterType> _emphasizedTypes(
-    List<DisasterCandidate> candidates,
-    HazardContext ctx,
-    bool shakeDetected,
-  ) {
-    final emphasized = {
-      for (final c in candidates)
-        if (c.score >= 70) c.type,
-    };
-    if (shakeDetected) {
-      emphasized.add(DisasterType.earthquake);
-      if (ctx.inTsunamiZone) emphasized.add(DisasterType.tsunami);
-    }
-    return emphasized;
-  }
-
-  DisasterType? _oneTapType(List<DisasterCandidate> candidates) {
-    if (candidates.isEmpty) return null;
-    final top = candidates.first;
-    if (top.score < 100) return null;
-    final othersLow = candidates.skip(1).every((c) => c.score <= 30);
-    return othersLow ? top.type : null;
-  }
-
-  Widget _oneTapButton(
-    BuildContext context,
-    DisasterType type,
-    VoidCallback onTap,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: SizedBox(
-        height: 56,
-        width: double.infinity,
-        child: FilledButton(
-          onPressed: onTap,
-          child: Text('${labelOf(type)}から避難する'),
         ),
       ),
     );

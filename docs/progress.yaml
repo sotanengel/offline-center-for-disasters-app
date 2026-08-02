@@ -8,7 +8,7 @@ meta:
   spec_source: オフライン災害対応アプリ_要件定義書.md
   spec_version: "2026-07-31"
   last_updated: "2026-08-02"
-  branch: feature/bundled-pack-merge
+  branch: main
 
 status_enum: [pending, in_progress, done, blocked, out_of_scope]
 
@@ -261,7 +261,8 @@ features:
     title: 同梱用統合パック（bundled）— 県別生成を merge して初回インストール
     spec_ref: "§12 / §14"
     phase: P1
-    status: in_progress
+    status: done
+    pr: 32
     notes: >-
       packgen.merge_pack で config.REGIONS 全県を 1 sqlite に統合。
       ランタイムは packs/bundled/pack.sqlite のみ（県境 selectActiveRegions 廃止）。
@@ -272,6 +273,14 @@ features:
     status: in_progress
     notes: >-
       LLM 基盤（data/llm, providers, 設定画面）は維持。UI からの入口のみ削除。
+  - id: F-BUG-01
+    title: 起動時の赤表示バグ修正（直近選択クリア・タイル強調除去）
+    spec_ref: "§3.2, §3.4"
+    phase: P2
+    status: in_progress
+    notes: >-
+      コールド起動時に RecentSelectionStore を clear。ハザードプライアは並び替えのみ。
+      揺れ検知 UI・センサ起動・§3.5 ワンタップボタンを無効化。
 
 # 地域データパック生成状況（Issue #8 で再生成完了 2026-08-01）
 data_packs:

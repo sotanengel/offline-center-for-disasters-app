@@ -5,7 +5,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:path/path.dart' as p;
 import 'package:path_provider/path_provider.dart';
-import 'package:sensors_plus/sensors_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../core/geo/geo_point.dart';
@@ -20,7 +19,6 @@ import '../data/pack/pack_loader.dart';
 import '../data/pack/region_pack_info.dart';
 import '../data/prefs/recent_selection_store.dart';
 import '../data/routing/graph_route_engine.dart';
-import '../data/sensors/shake_detector.dart';
 import '../domain/entities/disaster_candidate.dart';
 import '../domain/entities/enums.dart';
 import '../domain/entities/hazard_context.dart';
@@ -294,24 +292,10 @@ class DestinationPlanNotifier
 // センサ / STT / 一言入力
 // ---------------------------------------------------------------------------
 
-final shakeDetectorProvider = Provider<ShakeDetector>((ref) {
-  final detector = ShakeDetector(
-    accelStream: accelerometerEventStream().map(
-      (e) => AccelSample(e.x, e.y, e.z, DateTime.now()),
-    ),
-  );
-  ref.onDispose(detector.dispose);
-  return detector..start();
-});
-
-/// §3.4-b: 揺れ検知の保持状態 (新規検知イベントで更新)。
-final shakeDetectedProvider = StreamProvider<bool>((ref) async* {
-  final detector = ref.watch(shakeDetectorProvider);
-  yield detector.isDetected;
-  await for (final _ in detector.changes) {
-    yield detector.isDetected;
-  }
-});
+/// 揺れ検知 UI は無効化（F-BUG-01）。センサは起動しない。
+final shakeDetectedProvider = StreamProvider<bool>(
+  (ref) => Stream.value(false),
+);
 
 /// §3.2 L2: オフライン音声認識の可否。非対応ならマイクを非活性化する。
 ///
