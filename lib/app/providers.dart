@@ -35,12 +35,16 @@ import '../data/llm/leap_llm_engine.dart';
 import '../data/llm/leap_stub_engine.dart';
 import '../data/llm/llm_engine.dart';
 import '../data/llm/model_downloader.dart';
+import '../data/assistant/assistant_kb_loader.dart';
+import '../data/assistant/assistant_kb_search.dart';
+import '../data/assistant/assistant_search_tool.dart';
 import '../data/guidance/kb_guidance_service.dart';
 import '../data/pack/pack_source.dart';
 import '../domain/services/guidance_service.dart';
 import '../data/rule/rule_situation_analyzer.dart';
 import '../domain/services/situation_analyzer.dart';
 import '../domain/usecases/destination_plan_progress.dart';
+import '../domain/usecases/assistant_chat_usecase.dart';
 import '../domain/usecases/destination_planner.dart';
 
 /// シミュレータ / 統合テスト想定の現在地（江東区付近）。
@@ -380,6 +384,37 @@ final situationAnalyzerProvider = Provider<SituationAnalyzer>((ref) {
 /// §11.1 KB ガイド検索 + AI-3 リランキング（P6）。
 final guidanceServiceProvider = Provider<GuidanceService>((ref) {
   return KbGuidanceServiceLoader(reranker: ref.watch(guideRerankerProvider));
+});
+
+/// アシスタント KB（F-12）。
+final assistantKbBundleProvider = FutureProvider<AssistantKbBundle>((
+  ref,
+) async {
+  return AssistantKbLoader.load();
+});
+
+final assistantKbSearchProvider = FutureProvider<AssistantKbSearch>((
+  ref,
+) async {
+  final bundle = await ref.watch(assistantKbBundleProvider.future);
+  return AssistantKbSearch.fromBundle(bundle);
+});
+
+final assistantSearchToolProvider = FutureProvider<AssistantSearchTool>((
+  ref,
+) async {
+  final search = await ref.watch(assistantKbSearchProvider.future);
+  return AssistantSearchTool(search);
+});
+
+final assistantChatUseCaseProvider = FutureProvider<AssistantChatUseCase>((
+  ref,
+) async {
+  final tool = await ref.watch(assistantSearchToolProvider.future);
+  return AssistantChatUseCase(
+    llm: ref.watch(llmEngineProvider),
+    searchTool: tool,
+  );
 });
 
 /// 初回セットアップ完了フラグ。

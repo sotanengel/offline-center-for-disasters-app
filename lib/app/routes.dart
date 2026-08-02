@@ -6,11 +6,11 @@ import '../../domain/entities/guide_card.dart';
 import '../../domain/entities/situation_slots.dart';
 import '../ui/guide/guide_degrade_screen.dart';
 import '../ui/guide/guide_detail_screen.dart';
-import '../ui/home/home_screen.dart';
 import '../ui/nav/nav_screen.dart';
 import '../ui/onboarding/onboarding_screen.dart';
 import '../ui/result/result_screen.dart' show NavArgs, ResultScreen;
 import '../ui/settings/settings_screen.dart';
+import '../ui/shell/app_shell.dart';
 
 /// アプリ全体のルート定数。
 class AppRoutes {
@@ -29,18 +29,7 @@ Route<Object?>? onGenerateAppRoute(RouteSettings settings) {
     case AppRoutes.home:
       return MaterialPageRoute(
         settings: settings,
-        builder: (context) => HomeScreen(
-          onSelect: (slots) {
-            if (slots.disasterType == DisasterType.unknown &&
-                !slots.needsDisasterTypeConfirmation) {
-              Navigator.of(context).pushNamed(AppRoutes.guide);
-            } else {
-              Navigator.of(
-                context,
-              ).pushNamed(AppRoutes.result, arguments: slots);
-            }
-          },
-        ),
+        builder: (context) => const AppShell(),
       );
     case AppRoutes.result:
       final slots =

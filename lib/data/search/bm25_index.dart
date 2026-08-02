@@ -40,6 +40,22 @@ class Bm25Index {
     String query, {
     List<String> tagFilter = const [],
     int limit = 10,
+    double minScore = 0,
+  }) {
+    return searchScored(
+      query,
+      tagFilter: tagFilter,
+      limit: limit,
+      minScore: minScore,
+    ).map((e) => e.id).toList();
+  }
+
+  /// スコア付き検索。
+  List<({String id, double score})> searchScored(
+    String query, {
+    List<String> tagFilter = const [],
+    int limit = 10,
+    double minScore = 0,
   }) {
     final qTokens = _tokenize(query);
     final n = _docs.length;
@@ -71,7 +87,10 @@ class Bm25Index {
     }
     final ids = scores.keys.toList()
       ..sort((a, b) => scores[b]!.compareTo(scores[a]!));
-    return ids.take(limit).toList();
+    return [
+      for (final id in ids.take(limit))
+        if (scores[id]! >= minScore) (id: id, score: scores[id]!),
+    ];
   }
 
   static List<String> _tokenize(String text) {

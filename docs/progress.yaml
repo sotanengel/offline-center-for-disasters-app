@@ -273,6 +273,14 @@ features:
     status: in_progress
     notes: >-
       LLM 基盤（data/llm, providers, 設定画面）は維持。UI からの入口のみ削除。
+  - id: F-12
+    title: 災害対応アシスタント（フッターナビ + RAG チャット + 資料閲覧）
+    spec_ref: "§7, §11（拡張）"
+    phase: P7
+    status: in_progress
+    notes: >-
+      tools/kbgen で7資料→119 chunks。AI-7 検索必須 RAG。
+      AppShell 2タブ（ホーム/アシスタント）。
   - id: F-BUG-01
     title: 起動時の赤表示バグ修正（直近選択クリア・タイル強調除去）
     spec_ref: "§3.2, §3.4"

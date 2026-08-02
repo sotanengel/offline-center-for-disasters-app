@@ -3,12 +3,15 @@ import 'dart:async';
 import 'package:liquid_ai/liquid_ai.dart';
 
 import '../../core/result/result.dart';
+import '../../domain/entities/assistant_chat.dart';
 import '../../domain/entities/guide_card.dart';
 import '../../domain/entities/situation_slots.dart';
+import 'assistant_json_parser.dart';
 import 'device_tier_service.dart';
 import 'llm_engine.dart';
 import 'llm_errors.dart';
 import 'model_downloader.dart';
+import 'prompts/assistant_chat_prompt.dart';
 import 'prompts/slot_extraction_prompt.dart';
 import 'schemas/slot_schema.dart';
 import 'slot_json_parser.dart';
@@ -20,12 +23,14 @@ class LeapLlmEngine implements LlmEngine {
     required DeviceTierService tierService,
     required LlmModelChoice userChoice,
     SlotJsonParser? parser,
+    AssistantJsonParser? assistantParser,
     Duration inferenceTimeout = const Duration(seconds: 5),
     Duration idleUnload = const Duration(seconds: 60),
   }) : _downloader = downloader,
        _tierService = tierService,
        _userChoice = userChoice,
        _parser = parser ?? const SlotJsonParser(),
+       _assistantParser = assistantParser ?? const AssistantJsonParser(),
        _inferenceTimeout = inferenceTimeout,
        _idleUnload = idleUnload;
 
@@ -33,6 +38,7 @@ class LeapLlmEngine implements LlmEngine {
   final DeviceTierService _tierService;
   final LlmModelChoice _userChoice;
   final SlotJsonParser _parser;
+  final AssistantJsonParser _assistantParser;
   final Duration _inferenceTimeout;
   final Duration _idleUnload;
 
@@ -190,6 +196,65 @@ class LeapLlmEngine implements LlmEngine {
           )
           .timeout(const Duration(seconds: 3));
       return Ok(raw.trim());
+    } on TimeoutException {
+      return const Err(LlmError.timeout);
+    } catch (_) {
+      return const Err(LlmError.parseFailed);
+    }
+  }
+
+  @override
+  Future<Result<AssistantSearchRequest, LlmError>> planAssistantSearch({
+    required String userMessage,
+    required List<ChatTurn> history,
+  }) async {
+    final convResult = await _ensureConversation(
+      systemPrompt: assistantSearchPlanPrompt,
+    );
+    if (convResult is Err<Conversation, LlmError>) {
+      return Err(convResult.error);
+    }
+    final conversation = (convResult as Ok<Conversation, LlmError>).value;
+    try {
+      final raw = await conversation
+          .generateText(
+            '質問: $userMessage',
+            options: const GenerationOptions(temperature: 0.0, maxTokens: 64),
+          )
+          .timeout(_inferenceTimeout);
+      return _assistantParser.parseSearchPlan(raw);
+    } on TimeoutException {
+      return const Err(LlmError.timeout);
+    } catch (_) {
+      return const Err(LlmError.parseFailed);
+    }
+  }
+
+  @override
+  Future<Result<AssistantAnswer, LlmError>> generateAssistantAnswer({
+    required String userMessage,
+    required List<AssistantChunk> chunks,
+  }) async {
+    if (chunks.isEmpty) return const Err(LlmError.parseFailed);
+    final ids = chunks.map((c) => c.id).toList();
+    final context = chunks
+        .map((c) => '[${c.id}] ${c.title}\n${c.content}')
+        .join('\n\n');
+    final convResult = await _ensureConversation(
+      systemPrompt: assistantAnswerPrompt(ids),
+    );
+    if (convResult is Err<Conversation, LlmError>) {
+      return Err(convResult.error);
+    }
+    final conversation = (convResult as Ok<Conversation, LlmError>).value;
+    try {
+      final raw = await conversation
+          .generateText(
+            '質問: $userMessage\n\n資料:\n$context',
+            options: const GenerationOptions(temperature: 0.2, maxTokens: 300),
+          )
+          .timeout(const Duration(seconds: 8));
+      return _assistantParser.parseAnswer(raw);
     } on TimeoutException {
       return const Err(LlmError.timeout);
     } catch (_) {

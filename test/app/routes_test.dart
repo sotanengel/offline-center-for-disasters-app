@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'dart:convert';
+import 'dart:io';
 import 'package:offline_center_for_disasters/app/providers.dart';
 import 'package:offline_center_for_disasters/app/routes.dart';
+import 'package:offline_center_for_disasters/data/assistant/assistant_kb_loader.dart';
 import 'package:offline_center_for_disasters/domain/entities/disaster_candidate.dart';
 import 'package:offline_center_for_disasters/domain/entities/enums.dart';
 import 'package:offline_center_for_disasters/domain/entities/hazard_context.dart';
@@ -38,6 +41,16 @@ void main() {
   Future<void> pumpApp(WidgetTester tester) async {
     SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
+    final bundle = AssistantKbLoader.loadFromJson(
+      chunksJson:
+          jsonDecode(File('assets/kb/assistant/chunks.json').readAsStringSync())
+              as Map<String, dynamic>,
+      sourcesJson:
+          jsonDecode(
+                File('assets/kb/assistant/sources.json').readAsStringSync(),
+              )
+              as Map<String, dynamic>,
+    );
     await tester.pumpWidget(
       ProviderScope(
         overrides: [
@@ -52,6 +65,7 @@ void main() {
           recentSelectionProvider.overrideWith((ref) async => null),
           offlineSttAvailableProvider.overrideWith((ref) async => false),
           destinationPlanProviderOverride(),
+          assistantKbBundleProvider.overrideWith((ref) async => bundle),
         ],
         child: MaterialApp(
           initialRoute: AppRoutes.home,
