@@ -1,0 +1,76 @@
+{
+  "version": "1.0",
+  "categories": [
+    {
+      "id": "first_aid",
+      "label": "応急手当・救命"
+    },
+    {
+      "id": "shelter_health",
+      "label": "避難所生活での健康管理"
+    },
+    {
+      "id": "utilities",
+      "label": "停電・断水への即応"
+    },
+    {
+      "id": "post_disaster_action",
+      "label": "発災後の行動"
+    },
+    {
+      "id": "disaster_tips",
+      "label": "災害知識・Tips"
+    }
+  ],
+  "sources": [
+    {
+      "id": "tfd_first_aid",
+      "title": "東京消防庁「命を救う応急手当」",
+      "url": "https://www.tfd.metro.tokyo.lg.jp/content/000035496.pdf",
+      "category": "first_aid",
+      "publisher": "東京消防庁"
+    },
+    {
+      "id": "mhlw_guideline_110606",
+      "title": "避難所生活を過ごされる方々の健康管理に関するガイドライン",
+      "url": "https://www.mhlw.go.jp/bunya/kenkou/dl/guideline_110606.pdf",
+      "category": "shelter_health",
+      "publisher": "厚生労働省"
+    },
+    {
+      "id": "mhlw_disaster_0415",
+      "title": "被災地での健康を守るために",
+      "url": "https://www.mhlw.go.jp/bunya/kenkou/hoken-sidou/dl/disaster_0415.pdf",
+      "category": "shelter_health",
+      "publisher": "厚生労働省"
+    },
+    {
+      "id": "bousai_teiden",
+      "title": "地震直後の停電対策",
+      "url": "https://www.bousai.go.jp/jishin/syuto/denkikasaitaisaku/teidentaisaku.html",
+      "category": "utilities",
+      "publisher": "内閣府"
+    },
+    {
+      "id": "tokyo_kb_ch2",
+      "title": "東京くらし防災 第2章「いま」災害が起きたら？",
+      "url": "https://www.bousai.metro.tokyo.lg.jp/_res/common/2023_bk/kb/kb2023_0-00_090_151.pdf",
+      "category": "post_disaster_action",
+      "publisher": "東京都"
+    },
+    {
+      "id": "tokyo_kb_ch3",
+      "title": "東京くらし防災 第3章 発災後のくらし",
+      "url": "https://www.bousai.metro.tokyo.lg.jp/_res/common/2023_bk/kb/kb2023_000_152_179.pdf",
+      "category": "post_disaster_action",
+      "publisher": "東京都"
+    },
+    {
+      "id": "tokyo_tb_tips",
+      "title": "東京防災 もしもの防災Tips・知っておきたい災害知識",
+      "url": "https://www.bousai.metro.tokyo.lg.jp/_res/common/2023_bk/tb/tb2023_208_275n.pdf",
+      "category": "disaster_tips",
+      "publisher": "東京都"
+    }
+  ]
+}

@@ -1,4 +1,5 @@
 import '../../core/result/result.dart';
+import '../../domain/entities/assistant_chat.dart';
 import '../../domain/entities/guide_card.dart';
 import '../../domain/entities/situation_slots.dart';
 import 'llm_errors.dart';
@@ -21,6 +22,18 @@ abstract interface class LlmEngine {
   Future<Result<String, LlmError>> generatePhrase({
     required GuideCard card,
     required SituationSlots ctx,
+  });
+
+  /// AI-7a: アシスタント KB 検索計画。
+  Future<Result<AssistantSearchRequest, LlmError>> planAssistantSearch({
+    required String userMessage,
+    required List<ChatTurn> history,
+  });
+
+  /// AI-7b: 検索結果に基づく回答生成。
+  Future<Result<AssistantAnswer, LlmError>> generateAssistantAnswer({
+    required String userMessage,
+    required List<AssistantChunk> chunks,
   });
 
   /// §7.3: 60 秒非使用後のアンロード。
