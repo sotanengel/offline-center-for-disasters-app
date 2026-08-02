@@ -280,7 +280,7 @@ features:
     status: in_progress
     notes: >-
       コールド起動時に RecentSelectionStore を clear。ハザードプライアは並び替えのみ。
-      揺れ検知 UI・センサ起動を無効化。
+      揺れ検知 UI・センサ起動・§3.5 ワンタップボタンを無効化。
 
 # 地域データパック生成状況（Issue #8 で再生成完了 2026-08-01）
 data_packs:

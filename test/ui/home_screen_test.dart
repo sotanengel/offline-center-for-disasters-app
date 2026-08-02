@@ -158,8 +158,8 @@ void main() {
     });
   });
 
-  group('§3.5 種別明示ワンタップボタン', () {
-    testWidgets('単一種別 ≥100 かつ他 ≤30 のとき表示される', (tester) async {
+  group('§3.5 種別明示ワンタップボタン（無効化）', () {
+    testWidgets('単一種別 ≥100 かつ他 ≤30 でも表示しない', (tester) async {
       const ctx = HazardContext(inTsunamiZone: true, distCoastM: 500);
       await pumpHome(
         tester,
@@ -174,24 +174,25 @@ void main() {
           cand(DisasterType.volcano, 0, ctx),
         ],
       );
-      expect(find.text('津波から避難する'), findsOneWidget);
+      expect(find.text('津波から避難する'), findsNothing);
     });
 
-    testWidgets('他に高スコアがある場合は表示しない', (tester) async {
-      const ctx = HazardContext(inTsunamiZone: true, inFloodZone: true);
+    testWidgets('高潮区域でも「高潮から避難する」は表示しない', (tester) async {
+      const ctx = HazardContext(inStormSurgeZone: true);
       await pumpHome(
         tester,
         ctx: ctx,
         candidates: [
-          cand(DisasterType.tsunami, 135, ctx),
-          cand(DisasterType.flood, 100, ctx),
-          ...defaultCandidates(ctx).where(
-            (c) =>
-                c.type != DisasterType.tsunami && c.type != DisasterType.flood,
-          ),
+          cand(DisasterType.stormSurge, 100, ctx),
+          cand(DisasterType.earthquake, 30, ctx),
+          cand(DisasterType.fire, 20, ctx),
+          cand(DisasterType.tsunami, 0, ctx),
+          cand(DisasterType.flood, 0, ctx),
+          cand(DisasterType.landslide, 0, ctx),
+          cand(DisasterType.volcano, 0, ctx),
         ],
       );
-      expect(find.byKey(const Key('one_tap_evacuate')), findsNothing);
+      expect(find.text('高潮から避難する'), findsNothing);
     });
 
     testWidgets('緊急導線は表示されない', (tester) async {

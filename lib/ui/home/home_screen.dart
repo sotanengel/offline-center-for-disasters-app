@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app/providers.dart';
-import '../../domain/entities/disaster_candidate.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/entities/situation_slots.dart';
 import 'disaster_tile.dart';
@@ -32,7 +31,6 @@ class HomeScreen extends ConsumerWidget {
     final recent = ref.watch(recentSelectionProvider).value;
 
     final tiles = candidates.map((c) => c.type).toList();
-    final oneTap = _oneTapType(candidates);
 
     Future<void> select(DisasterType type) async {
       await ref.read(recentSelectionStoreProvider).save(type);
@@ -47,8 +45,6 @@ class HomeScreen extends ConsumerWidget {
         child: ListView(
           padding: const EdgeInsets.all(12),
           children: [
-            if (oneTap != null)
-              _oneTapButton(context, oneTap, () => select(oneTap)),
             if (recent != null) _recentChip(recent, () => select(recent)),
             const SizedBox(height: 8),
             GridView.count(
@@ -69,32 +65,6 @@ class HomeScreen extends ConsumerWidget {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  DisasterType? _oneTapType(List<DisasterCandidate> candidates) {
-    if (candidates.isEmpty) return null;
-    final top = candidates.first;
-    if (top.score < 100) return null;
-    final othersLow = candidates.skip(1).every((c) => c.score <= 30);
-    return othersLow ? top.type : null;
-  }
-
-  Widget _oneTapButton(
-    BuildContext context,
-    DisasterType type,
-    VoidCallback onTap,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 8),
-      child: SizedBox(
-        height: 56,
-        width: double.infinity,
-        child: FilledButton(
-          onPressed: onTap,
-          child: Text('${labelOf(type)}から避難する'),
         ),
       ),
     );

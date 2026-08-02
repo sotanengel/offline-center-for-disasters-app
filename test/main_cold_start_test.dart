@@ -8,12 +8,16 @@ void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
   test('main 相当: 起動時 clear 後は直近選択が null', () async {
+    final savedAt = DateTime(2026, 8, 2, 9, 0);
     SharedPreferences.setMockInitialValues({
       'recent_disaster_type': 'tsunami',
-      'recent_disaster_type_at': DateTime(2026, 8, 2, 9, 0).toIso8601String(),
+      'recent_disaster_type_at': savedAt.toIso8601String(),
     });
     final prefs = await SharedPreferences.getInstance();
-    final store = RecentSelectionStore(prefs);
+    final store = RecentSelectionStore(
+      prefs,
+      clock: () => savedAt.add(const Duration(minutes: 10)),
+    );
 
     expect(await store.recent(), DisasterType.tsunami);
 
